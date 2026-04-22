@@ -1,0 +1,1136 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<!-- PWA: Vollbild ohne Safari-UI -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="IK">
+<meta name="application-name" content="Inimei's Kitchen">
+<meta name="theme-color" content="#2D2D2D">
+<!-- PWA Manifest -->
+<link rel="manifest" href="data:application/json,{
+  &quot;name&quot;: &quot;Inimei's Kitchen&quot;,
+  &quot;short_name&quot;: &quot;IK&quot;,
+  &quot;start_url&quot;: &quot;.&quot;,
+  &quot;display&quot;: &quot;standalone&quot;,
+  &quot;background_color&quot;: &quot;%232D2D2D&quot;,
+  &quot;theme_color&quot;: &quot;%232D2D2D&quot;,
+  &quot;orientation&quot;: &quot;portrait&quot;,
+  &quot;icons&quot;: [{&quot;src&quot;:&quot;data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%232D2D2D'/><text y='70' x='15' font-size='65'>🍳</text></svg>&quot;,&quot;sizes&quot;:&quot;any&quot;,&quot;type&quot;:&quot;image/svg+xml&quot;}]
+}">
+<!-- Apple Touch Icons (inline SVG als Data URI) -->
+<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%232D2D2D'/><text y='68' x='12' font-size='62'>🍳</text></svg>">
+<title>Inimei's Kitchen</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bx:#9B2556;--mint:#5BBFB5;--dark:#2D2D2D;--bg:#F5F2EE;--white:#FFFFFF;--line:#E8E4DF;--pale:#AAA;--safe-top:env(safe-area-inset-top,0px);--safe-bottom:env(safe-area-inset-bottom,0px);}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+body{font-family:"DM Sans",sans-serif;background:var(--bg);color:var(--dark);height:100dvh;display:flex;flex-direction:column;overflow:hidden;}
+
+/* HEADER */
+header{background:var(--dark);padding:calc(var(--safe-top) + 16px) 20px 14px;flex-shrink:0;}
+.header-title{font-family:"Playfair Display",serif;color:white;font-size:1.3rem;margin-bottom:12px;}
+.header-title span{color:var(--mint);}
+.totals{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
+.total-box{background:rgba(255,255,255,0.07);border-radius:10px;padding:9px 12px;cursor:default;}
+.total-box.clickable{cursor:pointer;}
+.total-box.clickable:active{background:rgba(255,255,255,0.14);}
+.total-box-label{font-size:0.58rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--pale);margin-bottom:2px;}
+.total-box-val{font-family:"Playfair Display",serif;font-size:1.1rem;color:white;}
+.total-box-val.mint{color:var(--mint);}
+.total-box-val.warn{color:#F5A623;}
+.total-box-val.danger{color:#E05555;}
+.budget-bar-wrap{margin-top:10px;}
+.budget-bar-bg{height:4px;background:rgba(255,255,255,0.1);border-radius:2px;overflow:hidden;}
+.budget-bar-fill{height:100%;border-radius:2px;transition:width 0.4s,background 0.4s;}
+.budget-bar-label{font-size:0.62rem;color:var(--pale);margin-top:4px;display:flex;justify-content:space-between;}
+
+/* TABS */
+.tab-bar{display:flex;background:var(--white);border-bottom:2px solid var(--line);flex-shrink:0;}
+.tab{flex:1;padding:10px 6px;text-align:center;font-size:0.68rem;font-weight:600;color:var(--pale);cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px;transition:all 0.2s;user-select:none;display:flex;flex-direction:column;align-items:center;gap:3px;}
+.tab svg{stroke:currentColor;}
+.tab.active{color:var(--bx);border-bottom-color:var(--bx);}
+
+/* SCROLL */
+.scroll-area{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:calc(80px + var(--safe-bottom));}
+
+/* SEARCH BAR */
+.search-bar{background:var(--white);border-bottom:1px solid var(--line);padding:10px 12px;display:flex;gap:8px;flex-shrink:0;}
+.search-inp{flex:1;padding:10px 13px;border:1.5px solid var(--line);border-radius:10px;font-family:"DM Sans",sans-serif;font-size:0.92rem;background:var(--bg);outline:none;-webkit-appearance:none;color:var(--dark);}
+.search-inp:focus{border-color:var(--mint);}
+.btn-neu{padding:10px 14px;background:var(--bx);color:white;border:none;border-radius:10px;font-family:"DM Sans",sans-serif;font-size:0.88rem;font-weight:600;cursor:pointer;white-space:nowrap;}
+
+/* SUGGESTIONS */
+.suggestions{background:var(--white);border-bottom:1px solid var(--line);max-height:200px;overflow-y:auto;flex-shrink:0;display:none;}
+.sug-item{display:flex;align-items:center;padding:10px 16px;border-bottom:1px solid var(--line);gap:10px;}
+.sug-item:last-child{border-bottom:none;}
+.sug-info{flex:1;min-width:0;}
+.sug-name{font-size:0.88rem;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.sug-shop{font-size:0.7rem;color:var(--pale);}
+.sug-price{font-family:"Playfair Display",serif;font-size:0.92rem;color:var(--bx);font-weight:700;white-space:nowrap;}
+.sug-price.free{font-family:"DM Sans",sans-serif;font-size:0.78rem;color:var(--pale);font-weight:400;}
+.sug-add{background:var(--mint);color:white;border:none;border-radius:6px;padding:6px 12px;font-size:0.78rem;font-weight:600;cursor:pointer;flex-shrink:0;}
+
+/* LIST ITEMS */
+.sec-head{padding:12px 16px 4px;font-size:0.6rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--pale);display:flex;justify-content:space-between;}
+.item{display:flex;align-items:center;background:var(--white);border-bottom:1px solid var(--line);padding:12px 16px;gap:12px;transition:opacity 0.2s;}
+.item.done{opacity:0.35;}
+.item.done .item-name{text-decoration:line-through;}
+.check{width:26px;height:26px;border-radius:50%;border:2px solid var(--line);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:13px;color:white;cursor:pointer;transition:all 0.2s;background:transparent;}
+.item.done .check{background:var(--mint);border-color:var(--mint);}
+.item-body{flex:1;min-width:0;}
+.item-name{font-size:0.92rem;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.item-shop{font-size:0.68rem;color:var(--pale);margin-top:1px;}
+.item-qty{display:flex;align-items:center;gap:6px;flex-shrink:0;}
+.qty-btn{width:26px;height:26px;border-radius:50%;border:1.5px solid var(--line);background:none;font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--dark);font-weight:600;transition:all 0.15s;}
+.qty-btn:active{background:var(--mint);border-color:var(--mint);color:white;}
+.qty-num{font-size:0.88rem;font-weight:600;min-width:18px;text-align:center;color:var(--dark);}
+.price-btn{font-family:"Playfair Display",serif;font-size:0.95rem;font-weight:700;color:var(--bx);background:none;border:none;cursor:pointer;padding:4px 6px;border-radius:6px;white-space:nowrap;}
+.price-btn.free{color:var(--pale);font-family:"DM Sans",sans-serif;font-size:0.78rem;font-weight:400;}
+.del{background:none;border:none;color:#DDD;font-size:17px;cursor:pointer;padding:4px;flex-shrink:0;}
+.del:active{color:var(--bx);}
+
+/* REZEPTE */
+.recipe-search{padding:10px 12px;background:var(--white);border-bottom:1px solid var(--line);flex-shrink:0;}
+.recipe-search-inp{width:100%;padding:10px 13px;border:1.5px solid var(--line);border-radius:10px;font-family:"DM Sans",sans-serif;font-size:0.92rem;background:var(--bg);outline:none;-webkit-appearance:none;color:var(--dark);}
+.recipe-search-inp:focus{border-color:var(--mint);}
+.recipe-card{background:var(--white);border-bottom:1px solid var(--line);padding:14px 16px;cursor:pointer;transition:background 0.15s;}
+.recipe-card:active{background:var(--bg);}
+.recipe-name{font-size:0.95rem;font-weight:600;margin-bottom:4px;}
+.recipe-tags{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:6px;}
+.recipe-tag{font-size:0.65rem;font-weight:600;padding:2px 8px;border-radius:10px;background:var(--mint);color:white;text-transform:uppercase;letter-spacing:0.5px;}
+.recipe-zutaten{font-size:0.75rem;color:var(--pale);line-height:1.4;}
+.recipe-cost{font-family:"Playfair Display",serif;font-size:0.9rem;color:var(--bx);font-weight:700;margin-top:5px;}
+.recipe-add-btn{float:right;background:var(--dark);color:white;border:none;border-radius:8px;padding:6px 12px;font-family:"DM Sans",sans-serif;font-size:0.78rem;font-weight:600;cursor:pointer;}
+.recipe-add-btn:active{background:var(--bx);}
+
+/* WOCHENPLAN */
+.week-container{padding:12px;}
+.day-card{background:var(--white);border-radius:14px;margin-bottom:10px;overflow:hidden;border:1.5px solid var(--line);}
+.day-card.today{border-color:var(--mint);}
+.day-header{display:flex;align-items:center;padding:12px 14px;gap:10px;background:var(--white);}
+.day-card.today .day-header{background:rgba(91,191,181,0.08);}
+.day-name{font-size:0.72rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--pale);width:36px;flex-shrink:0;}
+.day-card.today .day-name{color:var(--mint);}
+.day-meal{flex:1;min-width:0;}
+.day-meal-name{font-size:0.92rem;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--dark);}
+.day-meal-empty{font-size:0.88rem;color:var(--pale);font-style:italic;}
+.day-add-btn{background:none;border:1.5px solid var(--line);border-radius:8px;padding:5px 10px;font-size:0.75rem;font-weight:600;color:var(--pale);cursor:pointer;white-space:nowrap;flex-shrink:0;}
+.day-add-btn.set{background:var(--dark);border-color:var(--dark);color:white;}
+.day-add-btn.set:active{background:var(--bx);border-color:var(--bx);}
+.day-add-btn:not(.set):active{border-color:var(--mint);color:var(--mint);}
+.week-bottom{padding:0 12px 12px;}
+.btn-week-shop{width:100%;padding:14px;background:var(--bx);color:white;border:none;border-radius:12px;font-family:"DM Sans",sans-serif;font-size:0.95rem;font-weight:600;cursor:pointer;}
+.btn-week-shop:active{background:#7a1a42;}
+.week-cost{text-align:center;padding:8px 0 4px;font-size:0.78rem;color:var(--pale);}
+.week-cost span{font-family:"Playfair Display",serif;color:var(--bx);font-size:0.92rem;}
+
+/* REZEPT PICKER MODAL */
+.picker-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:300;display:none;flex-direction:column;padding:60px 0 0;}
+.picker-box{background:var(--white);flex:1;border-radius:20px 20px 0 0;display:flex;flex-direction:column;overflow:hidden;}
+.picker-head{padding:16px 18px 10px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--line);flex-shrink:0;}
+.picker-title{font-family:"Playfair Display",serif;font-size:1rem;flex:1;}
+.picker-close{background:none;border:none;font-size:1.4rem;color:var(--pale);cursor:pointer;padding:4px;}
+.picker-search{padding:10px 14px;border-bottom:1px solid var(--line);flex-shrink:0;}
+.picker-search-inp{width:100%;padding:9px 13px;border:1.5px solid var(--line);border-radius:10px;font-family:"DM Sans",sans-serif;font-size:0.9rem;background:var(--bg);outline:none;color:var(--dark);}
+.picker-search-inp:focus{border-color:var(--mint);}
+.picker-list{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+.picker-item{padding:13px 18px;border-bottom:1px solid var(--line);cursor:pointer;font-size:0.92rem;font-weight:500;}
+.picker-item:active{background:var(--bg);}
+.picker-item.none{color:var(--pale);font-style:italic;font-weight:400;}
+
+/* EMPTY */
+.empty{text-align:center;padding:50px 30px;color:var(--pale);}
+.empty-icon{font-size:2.8rem;margin-bottom:10px;}
+.empty p{font-size:0.86rem;line-height:1.7;}
+.empty strong{color:var(--dark);}
+
+/* QUICK ACTIONS */
+.quick-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:10px 12px;background:var(--bg);border-bottom:1px solid var(--line);flex-shrink:0;}
+.quick-btn{border-radius:12px;padding:12px 10px;border:none;cursor:pointer;display:flex;flex-direction:column;align-items:flex-start;gap:2px;transition:transform 0.15s;}
+.quick-btn:active{transform:scale(0.97);}
+.budget-btn{background:linear-gradient(135deg,#9B2556,#c23068);}
+.cook-btn{background:linear-gradient(135deg,#5BBFB5,#3da89e);}
+.quick-icon{display:flex;align-items:center;}.quick-icon .qico{stroke:white;}
+.quick-label{font-size:0.82rem;font-weight:700;color:white;}
+.quick-sub{font-size:0.65rem;color:rgba(255,255,255,0.75);}
+
+/* SCANNER MODAL */
+.scanner-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:400;display:none;flex-direction:column;}
+.scanner-header{display:flex;align-items:center;gap:12px;padding:calc(var(--safe-top)+16px) 16px 14px;background:var(--dark);}
+.scanner-title{font-family:"Playfair Display",serif;color:white;font-size:1rem;flex:1;}
+.scanner-close{background:none;border:none;color:var(--pale);font-size:1.3rem;cursor:pointer;padding:4px;}
+.scanner-body{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;gap:16px;}
+.scanner-preview{width:100%;max-width:400px;border-radius:16px;overflow:hidden;background:var(--card);aspect-ratio:3/4;display:flex;align-items:center;justify-content:center;border:2px dashed var(--border);position:relative;}
+.scanner-preview img{width:100%;height:100%;object-fit:cover;}
+.scanner-placeholder{text-align:center;color:var(--muted);padding:20px;}
+.scanner-placeholder-icon{font-size:3rem;margin-bottom:8px;}
+.scanner-placeholder p{font-size:0.85rem;line-height:1.5;}
+.scanner-actions{display:flex;gap:10px;width:100%;max-width:400px;}
+.btn-scan-upload{flex:1;padding:14px;background:var(--card);border:1.5px solid var(--border);border-radius:12px;color:white;font-family:"DM Sans",sans-serif;font-size:0.9rem;font-weight:600;cursor:pointer;}
+.btn-scan-analyze{flex:2;padding:14px;background:var(--accent);border:none;border-radius:12px;color:var(--dark);font-family:"DM Sans",sans-serif;font-size:0.9rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;}
+.btn-scan-analyze:disabled{background:var(--border);color:var(--muted);cursor:not-allowed;}
+.scanner-result{width:100%;max-width:400px;background:var(--card);border-radius:12px;padding:14px;border:1px solid var(--border);max-height:200px;overflow-y:auto;}
+.scanner-result-item{display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);gap:8px;}
+.scanner-result-item:last-child{border-bottom:none;}
+.scanner-result-name{font-size:0.82rem;color:white;flex:1;}
+.scanner-result-price{font-family:"Playfair Display",serif;font-size:0.88rem;color:var(--accent);white-space:nowrap;}
+.scanner-result-shop{font-size:0.68rem;color:var(--muted);}
+.btn-scan-save{width:100%;max-width:400px;padding:14px;background:var(--mint);border:none;border-radius:12px;color:white;font-family:"DM Sans",sans-serif;font-size:0.92rem;font-weight:700;cursor:pointer;}
+
+/* QUICK COOK MODAL */
+.quickcook-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:300;display:none;flex-direction:column;padding:60px 0 0;}
+.quickcook-box{background:var(--white);flex:1;border-radius:20px 20px 0 0;display:flex;flex-direction:column;overflow:hidden;}
+.quickcook-head{padding:16px 18px 10px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--line);flex-shrink:0;}
+.quickcook-title{font-family:"Playfair Display",serif;font-size:1rem;flex:1;}
+.quickcook-close{background:none;border:none;font-size:1.3rem;color:var(--pale);cursor:pointer;}
+.quickcook-search{padding:10px 14px;border-bottom:1px solid var(--line);flex-shrink:0;}
+.quickcook-inp{width:100%;padding:9px 13px;border:1.5px solid var(--line);border-radius:10px;font-family:"DM Sans",sans-serif;font-size:0.9rem;background:var(--bg);outline:none;color:var(--dark);}
+.quickcook-inp:focus{border-color:var(--mint);}
+.quickcook-list{flex:1;overflow-y:auto;}
+.quickcook-item{padding:14px 18px;border-bottom:1px solid var(--line);cursor:pointer;display:flex;align-items:center;gap:10px;}
+.quickcook-item:active{background:var(--bg);}
+.quickcook-item-info{flex:1;}
+.quickcook-item-name{font-size:0.92rem;font-weight:500;}
+.quickcook-item-cost{font-size:0.72rem;color:var(--pale);}
+.quickcook-add{background:var(--dark);color:white;border:none;border-radius:8px;padding:7px 14px;font-size:0.78rem;font-weight:600;cursor:pointer;flex-shrink:0;}
+
+/* BOTTOM */
+.bottom-bar{position:fixed;bottom:0;left:0;right:0;background:var(--white);border-top:1px solid var(--line);padding:10px 14px calc(10px + var(--safe-bottom));display:flex;gap:8px;z-index:50;}
+.btn-bot{flex:1;padding:11px;border-radius:10px;font-family:"DM Sans",sans-serif;font-size:0.8rem;font-weight:600;cursor:pointer;border:1.5px solid var(--line);background:none;color:var(--pale);display:flex;align-items:center;justify-content:center;gap:6px;}
+.btn-bot:active{border-color:var(--bx);color:var(--bx);}
+.btn-bot.primary{background:var(--dark);color:white;border-color:var(--dark);flex:2;}
+.btn-bot.primary:active{background:var(--bx);border-color:var(--bx);}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:200;align-items:flex-end;padding-bottom:var(--safe-bottom);display:none;}
+.modal{background:var(--white);width:100%;border-radius:20px 20px 0 0;padding:22px 20px 26px;}
+.modal h3{font-family:"Playfair Display",serif;font-size:1.05rem;margin-bottom:3px;}
+.modal-sub{font-size:0.73rem;color:var(--pale);margin-bottom:14px;}
+.modal-inp{width:100%;padding:12px 14px;border:1.5px solid var(--line);border-radius:10px;font-family:"DM Sans",sans-serif;font-size:1rem;background:var(--bg);outline:none;-webkit-appearance:none;margin-bottom:10px;color:var(--dark);}
+.modal-inp:focus{border-color:var(--mint);}
+.modal-row{display:flex;gap:8px;}
+.btn-cancel{flex:1;padding:12px;border-radius:10px;border:1.5px solid var(--line);background:none;font-family:"DM Sans",sans-serif;font-size:0.88rem;color:var(--pale);cursor:pointer;}
+.btn-ok{flex:2;padding:12px;border-radius:10px;border:none;background:var(--dark);color:white;font-family:"DM Sans",sans-serif;font-size:0.88rem;font-weight:600;cursor:pointer;}
+.btn-ok:active{background:var(--bx);}
+
+/* TOAST */
+.toast{position:fixed;bottom:calc(76px + var(--safe-bottom));left:50%;transform:translateX(-50%) translateY(10px);background:var(--dark);color:white;padding:9px 18px;border-radius:20px;font-size:0.8rem;font-weight:500;opacity:0;transition:all 0.25s;pointer-events:none;white-space:nowrap;z-index:300;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+.scan-btn{background:rgba(255,255,255,0.1);border:1.5px solid rgba(255,255,255,0.2);border-radius:10px;padding:7px 12px;font-size:1.1rem;cursor:pointer;color:white;transition:all 0.2s;flex-shrink:0;}
+.scan-btn:active{background:var(--mint);border-color:var(--mint);}
+</style>
+
+<script>
+// Service Worker registrieren für Offline-Support
+if('serviceWorker' in navigator) {
+  const swCode = `
+self.addEventListener('install', e => {
+  e.waitUntil(
+    caches.open('ik-v1').then(cache => cache.addAll([location.pathname]))
+  );
+});
+self.addEventListener('fetch', e => {
+  e.respondWith(
+    caches.match(e.request).then(r => r || fetch(e.request).catch(() => caches.match(e.request)))
+  );
+});
+  `;
+  const blob = new Blob([swCode], {type: 'application/javascript'});
+  const swUrl = URL.createObjectURL(blob);
+  navigator.serviceWorker.register(swUrl).catch(()=>{});
+}
+</script>
+</head>
+<body>
+
+<!-- SVG Icon Sprites -->
+<svg style="display:none" xmlns="http://www.w3.org/2000/svg">
+  <symbol id="ico-cart" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
+    <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+  </symbol>
+  <symbol id="ico-book" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+  </symbol>
+  <symbol id="ico-calendar" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+  </symbol>
+  <symbol id="ico-camera" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+    <circle cx="12" cy="13" r="4"/>
+  </symbol>
+  <symbol id="ico-wallet" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/>
+  </symbol>
+  <symbol id="ico-zap" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+  </symbol>
+  <symbol id="ico-refresh" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+  </symbol>
+  <symbol id="ico-sparkle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M12 2L9.5 9.5 2 12l7.5 2.5L12 22l2.5-7.5L22 12l-7.5-2.5z"/>
+  </symbol>
+  <symbol id="ico-trash" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+  </symbol>
+  <symbol id="ico-pot" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M3 11l19-9-9 19-2-8-8-2z"/>
+  </symbol>
+</svg>
+
+
+<header>
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+    <div class="header-title">Inimei's <span>Kitchen</span></div>
+    <button class="scan-btn" onclick="openScanner()" title="Bon scannen"><svg width="20" height="20" class=""><use href="#ico-camera"/></svg></button>
+  </div>
+  <div class="totals">
+    <div class="total-box"><div class="total-box-label">Liste gesamt</div><div class="total-box-val" id="valTotal">0,00 €</div></div>
+    <div class="total-box"><div class="total-box-label">Im Korb</div><div class="total-box-val mint" id="valDone">0,00 €</div></div>
+    <div class="total-box clickable" onclick="openBudgetModal()" title="Budget ändern">
+      <div class="total-box-label">Budget</div>
+      <div class="total-box-val" id="valBudget">— €</div>
+    </div>
+  </div>
+  <div class="budget-bar-wrap" id="budgetBarWrap" style="display:none;">
+    <div class="budget-bar-bg"><div class="budget-bar-fill" id="budgetBarFill"></div></div>
+    <div class="budget-bar-label"><span id="budgetBarLeft"></span><span id="budgetBarPct"></span></div>
+  </div>
+</header>
+
+<div class="tab-bar">
+  <div class="tab active" id="tab-liste" onclick="switchTab('liste')"><svg width="18" height="18" class=""><use href="#ico-cart"/></svg> <span>Liste</span></div>
+  <div class="tab" id="tab-rezepte" onclick="switchTab('rezepte')"><svg width="18" height="18" class=""><use href="#ico-book"/></svg> <span>Rezepte</span></div>
+  <div class="tab" id="tab-woche" onclick="switchTab('woche')"><svg width="18" height="18" class=""><use href="#ico-calendar"/></svg> <span>Woche</span></div>
+</div>
+
+<!-- LISTE TAB -->
+<div id="view-liste" style="display:flex;flex-direction:column;flex:1;overflow:hidden;">
+  <div class="search-bar">
+    <input class="search-inp" id="searchInp" placeholder="Artikel suchen…" autocomplete="off" autocorrect="off" spellcheck="false"/>
+    <button class="btn-neu" onclick="openAddModal()">+ Neu</button>
+  </div>
+  <div class="quick-actions" id="quickActions">
+    <button class="quick-btn budget-btn" onclick="switchTab('woche');setTimeout(()=>suggestWeekPlan(),100)">
+      <span class="quick-icon"><svg width="22" height="22" class="qico"><use href="#ico-wallet"/></svg></span>
+      <span class="quick-label">Budget-Woche</span>
+      <span class="quick-sub" id="quickBudgetSub">Wochenplan aus Budget</span>
+    </button>
+    <button class="quick-btn cook-btn" onclick="openQuickCook()">
+      <span class="quick-icon"><svg width="22" height="22" class="qico"><use href="#ico-zap"/></svg></span>
+      <span class="quick-label">Schnell kochen</span>
+      <span class="quick-sub">Rezept → Einkaufsliste</span>
+    </button>
+  </div>
+  <div class="suggestions" id="suggestions"></div>
+  <div class="scroll-area" id="scrollList"></div>
+</div>
+
+<!-- REZEPTE TAB -->
+<div id="view-rezepte" style="display:none;flex-direction:column;flex:1;overflow:hidden;">
+  <div class="search-bar">
+    <input class="search-inp" id="recipeSearch" placeholder="Rezept suchen…" autocomplete="off" autocorrect="off" spellcheck="false" oninput="renderRecipes()"/>
+    <button class="btn-neu" onclick="openNewRecipeModal()">+ Neu</button>
+  </div>
+  <div class="scroll-area" id="scrollRecipes"></div>
+</div>
+
+<div class="bottom-bar" id="bottomBar">
+  <button class="btn-bot" onclick="clearDone()"><svg width="16" height="16" class=""><use href="#ico-trash"/></svg> Erledigt</button>
+  <button class="btn-bot primary" onclick="resetChecks()"><svg width="16" height="16" class=""><use href="#ico-refresh"/></svg> Neuer Einkauf</button>
+</div>
+
+<!-- WOCHENPLAN TAB -->
+<div id="view-woche" style="display:none;flex-direction:column;flex:1;overflow:hidden;">
+  <div class="scroll-area">
+    <div class="week-container" id="weekContainer"></div>
+    <div class="week-cost">Geschätzte Kosten: <span id="weekCost">0,00 €</span></div>
+    <div class="week-bottom">
+      <button class="btn-week-shop" style="margin-bottom:8px;background:var(--mint);" onclick="suggestWeekPlan()"><svg width="16" height="16" class=""><use href="#ico-sparkle"/></svg> Wochenplan vorschlagen</button>
+      <button class="btn-week-shop" onclick="weekToList()"><svg width="16" height="16" class=""><use href="#ico-cart"/></svg> Alle Zutaten auf Liste</button>
+    </div>
+  </div>
+</div>
+
+<!-- REZEPT PICKER -->
+<div class="picker-overlay" id="pickerOverlay">
+  <div class="picker-box">
+    <div class="picker-head">
+      <div class="picker-title" id="pickerTitle">Rezept wählen</div>
+      <button class="picker-close" onclick="closePicker()">✕</button>
+    </div>
+    <div class="picker-search">
+      <input class="picker-search-inp" id="pickerSearch" placeholder="Rezept suchen…" autocomplete="off" autocorrect="off" oninput="renderPicker()"/>
+    </div>
+    <div class="picker-list" id="pickerList"></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+  <div class="modal">
+    <h3 id="modalTitle">Neuer Artikel</h3>
+    <p class="modal-sub" id="modalSub"></p>
+    <input class="modal-inp" id="modalName" placeholder="Artikelname" autocorrect="off"/>
+    <input class="modal-inp" type="number" id="modalPrice" placeholder="Preis pro Stück in € (z.B. 0.25)" step="0.01" min="0"/>
+<input class="modal-inp" type="number" id="modalQty" placeholder="Anzahl (z.B. 6)" step="1" min="1" value="1"/>
+    <div class="modal-row">
+      <button class="btn-cancel" onclick="closeModalDirect()">Abbrechen</button>
+      <button class="btn-ok" id="modalOk" onclick="modalOk()">Hinzufügen</button>
+    </div>
+  </div>
+</div>
+
+<!-- BUDGET MODAL -->
+<div class="modal-overlay" id="budgetModalOverlay" onclick="closeBudgetModal(event)">
+  <div class="modal">
+    <h3><svg width="18" height="18" class=""><use href="#ico-wallet"/></svg> Wochenbudget</h3>
+    <p class="modal-sub">Dein Budget für Lebensmittel diese Woche</p>
+    <input class="modal-inp" type="number" id="budgetInp" placeholder="z.B. 80" step="5" min="0"/>
+    <div class="modal-row">
+      <button class="btn-cancel" onclick="closeBudgetModalDirect()">Abbrechen</button>
+      <button class="btn-ok" onclick="saveBudget()">Speichern</button>
+    </div>
+  </div>
+</div>
+
+<!-- REZEPT MODAL -->
+<div class="modal-overlay" id="recipeModalOverlay" onclick="closeRecipeModal(event)">
+  <div class="modal">
+    <h3 id="recipeModalTitle">Neues Rezept</h3>
+    <p class="modal-sub">Zutaten mit Komma trennen, z.B.: Pasta, Tomaten, Zwiebeln</p>
+    <input class="modal-inp" id="recipeModalName" placeholder="Rezeptname" autocorrect="off"/>
+    <input class="modal-inp" id="recipeModalTags" placeholder="Tags (z.B. Schnell, Gesund)" autocorrect="off"/>
+    <textarea class="modal-inp" id="recipeModalZutaten" placeholder="Zutaten (kommasepariert)" rows="3" style="resize:none;height:80px;"></textarea>
+    <div class="modal-row">
+      <button class="btn-cancel" onclick="closeRecipeModalDirect()">Abbrechen</button>
+      <button class="btn-ok" id="recipeModalOk" onclick="saveNewRecipe()">Speichern</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const RECIPES = [{"name": "Hühner-Nudel-Suppe", "tags": "Wochenende", "zutaten": ["Hähnchenschenkel", "Hühnerbrühe", "Möhren", "Sellerie"]}, {"name": "Steak und Eier", "tags": "Belohnung", "zutaten": ["Steak", "Eier"]}, {"name": "Gemischter Salat", "tags": "Gesund", "zutaten": ["Speck", "Tomaten", "Salat", "Salatdressing", "Eier", "Avocado", "Hähnchenschenkel"]}, {"name": "Gebackenes Hähnchen mit Kartoffeln", "tags": "Schwer", "zutaten": ["Hähnchenschenkel", "Kartoffeln"]}, {"name": "Grillkäse", "tags": "Belohnung", "zutaten": ["Sauerteig", "Cheddarkäse"]}, {"name": "Lachs mit Spargel", "tags": "Gesund, Protein", "zutaten": ["Lachsfilets", "Spargel", "Eier"]}, {"name": "Brokkoli-Kartoffelsuppe mit Cheddar", "tags": "", "zutaten": ["Brokkoli", "Kartoffeln", "Cheddar gerieben"]}, {"name": "Nudeln mit Champignonrahm", "tags": "", "zutaten": ["Pasta", "Champignons", "H-Sahne"]}, {"name": "Mac & Cheese", "tags": "", "zutaten": ["Pasta", "Cheddar gerieben", "Milch 3,5 %"]}, {"name": "Nudeln mit Tomatensauce", "tags": "", "zutaten": ["Pasta", "Tomaten", "Zwiebeln"]}, {"name": "Hühnersuppe", "tags": "", "zutaten": ["Hähnchenschenkel", "Möhren", "Sellerie", "Zwiebeln"]}, {"name": "Gemüsesuppe", "tags": "", "zutaten": ["Möhren", "Kartoffeln", "Sellerie", "Zwiebeln"]}, {"name": "Lachs mit Kartoffelbrei und Gurkensalat", "tags": "", "zutaten": ["Lachsfilets", "Kartoffeln", "Gurke"]}, {"name": "Putensteaks in Rahmsauce mit Reis und Feldsalat", "tags": "", "zutaten": ["Putenschnitzel", "H-Sahne", "Feldsalat"]}, {"name": "Forelle mit Feldsalat und Sauce Hollandaise", "tags": "", "zutaten": ["Geräuchertes Forellenfilet", "Feldsalat", "Eier"]}, {"name": "Pizza", "tags": "", "zutaten": ["Wraps Mehrkorn", "Tomaten", "Cheddar gerieben"]}, {"name": "Flammkuchen", "tags": "", "zutaten": ["Wraps Mehrkorn", "H-Sahne", "Speck", "Zwiebeln"]}, {"name": "Backfisch mit Pommes und Gurkensalat", "tags": "", "zutaten": ["Lachsfilet", "Tiefkühlpommes", "Gurke"]}, {"name": "Hamburger mit Pommes und Coleslaw", "tags": "", "zutaten": ["Rinder Burger", "Hamburger Brötchen", "Tiefkühlpommes", "Eisbergsalat"]}, {"name": "Gulasch mit Nudeln", "tags": "", "zutaten": ["Rindergulasch", "Zwiebeln", "Spitzpaprika", "Tomaten", "Pasta"]}, {"name": "Putenmedaillons in Rahmsauce mit Pilav", "tags": "", "zutaten": ["Putenschnitzel", "H-Sahne", "Feldsalat"]}, {"name": "Putenschnitzel mit Pommes", "tags": "", "zutaten": ["Putenschnitzel", "Tiefkühlpommes"]}, {"name": "Würstchen mit Kartoffelbrei und Spargelsalat", "tags": "", "zutaten": ["Wiener Würstchen", "Kartoffeln", "Spargel weiß"]}, {"name": "Cevapcici mit Fladenbrot", "tags": "", "zutaten": ["Rinder Burger", "Wraps Mehrkorn", "Joghurt"]}, {"name": "Pfannenpizza", "tags": "", "zutaten": ["Wraps Mehrkorn", "Tomaten", "Cheddar gerieben", "Salami"]}, {"name": "Wienerle mit Kartoffelbrei und Salat", "tags": "", "zutaten": ["Wiener Würstchen", "Kartoffeln", "Feldsalat"]}, {"name": "Bratwürstchen mit Bratkartoffeln", "tags": "", "zutaten": ["Bratwurst", "Kartoffeln"]}, {"name": "Milchreis", "tags": "", "zutaten": ["Milch 3,5 %", "Pirinc Reis"]}, {"name": "Pfannkuchen", "tags": "", "zutaten": ["Eier", "Milch 3,5 %", "Weizenmehl"]}, {"name": "Griesbrei", "tags": "", "zutaten": ["Milch 3,5 %"]}, {"name": "Fischstäbchen mit Pommes", "tags": "Freitag", "zutaten": ["Tiefkühlpommes"]}, {"name": "Nudelsalat mit Thunfisch und Avocado", "tags": "Samstag", "zutaten": ["Pasta", "Avocado", "Mayonaise"]}, {"name": "Nudeln mit Knoblauchjoghurt", "tags": "", "zutaten": ["Pasta", "Joghurt", "Knoblauch"]}, {"name": "Caesar Salat", "tags": "", "zutaten": ["Eisbergsalat", "Eier", "Parmesan"]}, {"name": "Butterhirse mit Hähnchen und Salat", "tags": "", "zutaten": ["Hähnchenschenkel", "Feldsalat"]}, {"name": "Fleischeintopf mit Pilav", "tags": "", "zutaten": ["Joghurt", "Rindergulasch", "Zwiebeln", "Suppengemüse"]}, {"name": "Lachs mit Rote Beete Salat und Kartoffeln", "tags": "", "zutaten": ["Lachsfilet", "Kartoffeln"]}, {"name": "Taze Fasulye mit Reis", "tags": "", "zutaten": ["Breite Bohnen", "Pirinc Reis", "Tomaten"]}, {"name": "Karottensalat", "tags": "", "zutaten": ["Bio Karotten", "Zitronen"]}, {"name": "Kartoffelsalat", "tags": "", "zutaten": ["Kartoffeln", "Mayonaise", "Petersilie"]}, {"name": "Tomatensuppe", "tags": "", "zutaten": ["Tomaten", "Zwiebeln", "H-Sahne"]}, {"name": "Kürbissuppe", "tags": "", "zutaten": ["Zwiebeln", "H-Sahne"]}, {"name": "Lachssuppe", "tags": "", "zutaten": ["Lachsfilet", "Kartoffeln", "H-Sahne", "Möhren"]}];
+const BASE_CATALOG = {"Eisbergsalat": {"price": 1.11, "shop": "Lidl", "cat": "Gemüse"}, "Feldsalat": {"price": 1.0, "shop": "Penny", "cat": "Gemüse"}, "Stilles Wasser": {"price": 0.25, "shop": "Lidl", "cat": "Getränke"}, "Mineralwasser": {"price": 0.75, "shop": "Lidl", "cat": "Getränke"}, "Erdbeeren": {"price": 1.99, "shop": "Penny", "cat": "Obst"}, "Zitronen": {"price": 1.39, "shop": "Lidl", "cat": "Obst"}, "Freilandeier XXL": {"price": 3.99, "shop": "Lidl", "cat": "Fleisch&Fisch"}, "Nuss-Nougat-Creme": {"price": 1.99, "shop": "Lidl", "cat": "Süßigkeiten"}, "Pasta": {"price": 2.59, "shop": "Aldi", "cat": "Trockenwaren"}, "Linsenwaffeln": {"price": 1.35, "shop": "Aldi", "cat": "Trockenwaren"}, "Gurken": {"price": 1.49, "shop": "Lidl", "cat": "Gemüse"}, "Soft Panini": {"price": 1.59, "shop": "Aldi", "cat": "Backwaren"}, "Ziegenfrischkäse": {"price": 1.99, "shop": "Aldi", "cat": "Milchprodukte"}, "Heidelbeeren": {"price": 1.59, "shop": "Aldi", "cat": "Obst"}, "Petersilie": {"price": 1.59, "shop": "Lidl", "cat": "Gemüse"}, "Avocado": {"price": 0.89, "shop": "Aldi", "cat": "Gemüse"}, "Joghurt": {"price": 1.15, "shop": "Aldi", "cat": "Milchprodukte"}, "Mandeln": {"price": 2.29, "shop": "Aldi", "cat": "Trockenwaren"}, "Rindergulasch": {"price": 6.39, "shop": "Aldi", "cat": "Fleisch&Fisch"}, "Spitzpaprika": {"price": 1.89, "shop": "Aldi", "cat": "Gemüse"}, "Wraps": {"price": 1.29, "shop": "Aldi", "cat": "Backwaren"}, "Spätzle": {"price": 2.69, "shop": "Aldi", "cat": "Trockenwaren"}, "Spargel weiß": {"price": 2.44, "shop": "Aldi", "cat": "Gemüse"}, "Hundefutter nass": {"price": 0.75, "shop": "Aldi", "cat": "Hundefutter"}, "Irischer Cheddarkäse": {"price": 2.49, "shop": "Aldi", "cat": "Milchprodukte"}, "Lauchzwiebeln": {"price": 0.49, "shop": "Aldi", "cat": "Gemüse"}, "Gurke": {"price": 0.69, "shop": "Penny", "cat": "Gemüse"}, "Frühkartoffeln": {"price": 2.29, "shop": "Aldi", "cat": "Gemüse"}, "Nektarinen": {"price": 1.79, "shop": "Aldi", "cat": "Obst"}, "Wiener Würstchen": {"price": 5.78, "shop": "Aldi", "cat": "Fleisch&Fisch"}, "Bio Karotten": {"price": 0.99, "shop": "Aldi", "cat": "Gemüse"}, "Bio Honig": {"price": 3.75, "shop": "Aldi", "cat": "Süßigkeiten"}, "Wraps Mehrkorn": {"price": 1.59, "shop": "Aldi", "cat": "Backwaren"}, "Das Rustikale Dinkelbrot": {"price": 1.89, "shop": "Aldi", "cat": "Backwaren"}, "Champignons": {"price": 1.39, "show": "Aldi", "cat": "Gemüse"}, "Bio Reiswaffeln": {"price": 0.65, "shop": "Aldi", "cat": "Trockenwaren"}, "Österreichischer Bergkäse": {"price": 3.99, "shop": "Aldi", "cat": "Milchprodukte"}, "Gouda gerieben": {"price": 2.39, "shop": "Aldi", "cat": "Milchprodukte"}, "Weihenstephan Butter": {"price": 2.29, "shop": "Aldi", "cat": "Milchprodukte"}, "Tomaten": {"price": 1.18, "shop": "Rewe", "cat": "Gemüse"}, "Geflügel Fleischwurst": {"price": 2.79, "shop": "Aldi", "cat": "Fleisch&Fisch"}, "Sonntagsbrötchen": {"price": 1.19, "shop": "Aldi", "cat": "Backwaren"}, "Kartoffeln": {"price": 3.49, "shop": "Aldi", "cat": "Gemüse"}, "Tiefkühlpommes": {"price": 1.79, "shop": "Aldi", "cat": "Gemüse"}, "Lachsfilet": {"price": 9.99, "shop": "Aldi", "cat": "Fleisch&Fisch"}, "Cocktailtomaten": {"price": 1.29, "shop": "Aldi", "cat": "Gemüse"}, "Putenschnitzel": {"price": 4.99, "shop": "Aldi", "cat": "Fleisch&Fisch"}, "Eier": {"price": 2.39, "shop": "Aldi", "cat": "Milchprodukte"}, "Apfelecke": {"price": 0.69, "shop": "Aldi", "cat": "Backwaren"}, "Rispentomaten": {"price": 1.79, "shop": "Penny", "cat": "Gemüse"}, "Buttercroissant": {"price": 0.49, "shop": "Aldi", "cat": "Backwaren"}, "Flabatta": {"price": 0.99, "shop": "Aldi", "cat": "Backwaren"}, "Bio Zucchini": {"price": 0.85, "shop": "Aldi", "cat": "Gemüse"}, "Auberginen": {"price": 0.59, "shop": "Aldi", "cat": "Gemüse"}, "Kohlrabi": {"price": 0.55, "shop": "Aldi", "cat": "Gemüse"}, "H-Sahne": {"price": 0.99, "shop": "Aldi", "cat": "Milchprodukte"}, "Frischkäse Ziege": {"price": 1.59, "shop": "Aldi", "cat": "Milchprodukte"}, "Franzbrötchen": {"price": 0.79, "shop": "Aldi", "cat": "Backwaren"}, "Rinder Burger": {"price": 2.99, "shop": "Aldi", "cat": "Fleisch&Fisch"}, "Hamburger Brötchen": {"price": 0.99, "shop": "Aldi", "cat": "Backwaren"}, "Bananen": {"price": 0.89, "shop": "Aldi", "cat": "Obst"}, "Mayonaise": {"price": 1.69, "shop": "Aldi", "cat": "Sonstiges"}, "Panini": {"price": 1.59, "shop": "Aldi", "cat": "Backwaren"}, "Bio-Joghurt": {"price": 1.99, "shop": "Aldi", "cat": "Milchprodukte"}, "Cheddar gerieben": {"price": 2.49, "shop": "Aldi", "cat": "Milchprodukte"}, "Salami": {"price": 1.99, "shop": "Aldi", "cat": "Fleisch&Fisch"}, "Bratwurst": {"price": 2.59, "shop": "Aldi", "cat": "Fleisch&Fisch"}, "Putengeschnetzeltes XXL": {"price": 5.99, "shop": "Aldi", "cat": "Fleisch&Fisch"}, "Paprika": {"price": 0.99, "shop": "Aldi", "cat": "Gemüse"}, "Bio Babyspinat": {"price": 1.09, "shop": "Aldi", "cat": "Gemüse"}, "Wellenschnittpommes": {"price": 1.79, "shop": "Aldi", "cat": "Gemüse"}, "Griechischer Joghurt": {"price": 2.19, "shop": "Lidl", "cat": "Milchprodukte"}, "Rinder Hamburger": {"price": 4.19, "shop": "Aldi", "cat": "Fleisch&Fisch"}, "Wassermelone": {"price": 1.15, "shop": "Aldi", "cat": "Obst"}, "Geräuchertes Forellenfilet": {"price": 2.49, "shop": "Lidl", "cat": "Fleisch&Fisch"}, "10 Freilandeier": {"price": 2.39, "shop": "Lidl", "cat": "Fleisch&Fisch"}, "Weizenbrötchen": {"price": 0.19, "shop": "Aldi", "cat": "Backwaren"}, "Küchentücher": {"price": 2.85, "shop": "DM", "cat": "Haushaltsartikel"}, "Weizenmehl": {"price": 0.85, "shop": "DM", "cat": "Trockenwaren"}, "Meersalz jodiert": {"price": 0.75, "shop": "DM", "cat": "Trockenwaren"}, "Dinkelmehl": {"price": 1.35, "shop": "DM", "cat": "Trockenwaren"}, "Milch 3,5 %": {"price": 1.15, "shop": "DM", "cat": "Milchprodukte"}, "Senf": {"price": 1.45, "shop": "DM", "cat": "Sonstiges"}, "Toilettenpapier": {"price": 4.89, "shop": "Rossmann", "cat": "Haushaltsartikel"}, "Spülmittel": {"price": 0.95, "shop": "DM", "cat": "Haushaltsartikel"}, "Bio Joghurt": {"price": 1.15, "shop": "Aldi", "cat": "Milchprodukte"}, "Brokkoli": {"price": 0.75, "shop": "Aldi", "cat": "Gemüse"}, "Breite Bohnen": {"price": 1.89, "shop": "Aldi", "cat": "Gemüse"}, "Bio Bergbauernkäse": {"price": 3.49, "shop": "Aldi", "cat": "Milchprodukte"}, "Hähnchen Flügel": {"price": 5.59, "shop": "Aldi", "cat": "Fleisch&Fisch"}, "Kerrygold Butter": {"price": 3.99, "shop": "Lidl", "cat": "Milchprodukte"}, "Suppengemüse": {"price": 1.69, "shop": "Aldi", "cat": "Gemüse"}, "Pirinc Reis": {"price": 9.99, "shop": "Bakal Dogan", "cat": "Trockenwaren"}, "Zwiebeln": {"price": 1.99, "shop": "Aldi", "cat": "Gemüse"}, "Bio Salami": {"price": 1.99, "shop": "Aldi", "cat": "Fleisch&Fisch"}, "Mini Gurken": {"price": 0.99, "shop": "Aldi", "cat": "Gemüse"}, "Spargel": {"price": 2.44, "shop": "Aldi", "cat": "Gemüse"}, "Möhren": {"price": 0.99, "shop": "Aldi", "cat": "Gemüse"}, "Sellerie": {"price": 0.99, "shop": "Aldi", "cat": "Gemüse"}, "Hähnchenschenkel": {"price": 3.99, "shop": "Aldi", "cat": "Fleisch&Fisch"}, "Lachsfilets": {"price": 9.99, "shop": "Aldi", "cat": "Fleisch&Fisch"}, "Knoblauch": {"price": 0.49, "shop": "Aldi", "cat": "Gemüse"}, "Speck": {"price": 1.99, "shop": "Aldi", "cat": "Fleisch&Fisch"}, "Steak": {"price": 8.99, "shop": "Aldi", "cat": "Fleisch&Fisch"}, "Salat": {"price": 0.99, "shop": "Aldi", "cat": "Gemüse"}, "Salatdressing": {"price": 1.49, "shop": "Aldi", "cat": "Sonstiges"}, "Cheddarkäse": {"price": 2.49, "shop": "Aldi", "cat": "Milchprodukte"}, "Sauerteig": {"price": 1.99, "shop": "Aldi", "cat": "Backwaren"}, "Hühnerbrühe": {"price": 0.99, "shop": "Aldi", "cat": "Sonstiges"}, "Bio Bananen": {"price": 0.27, "shop": "Penny", "cat": "Obst"}, "Mortadella": {"price": 1.99, "shop": "Penny", "cat": "Fleisch&Fisch"}, "Geflügelsalami": {"price": 1.99, "shop": "Penny", "cat": "Fleisch&Fisch"}, "Cheddar": {"price": 2.79, "shop": "Penny", "cat": "Milchprodukte"}, "Laugenbrezel": {"price": 0.39, "shop": "Penny", "cat": "Backwaren"}, "Laugenstange": {"price": 0.39, "shop": "Penny", "cat": "Backwaren"}, "Berliner": {"price": 0.45, "shop": "Penny", "cat": "Backwaren"}, "Bio Körner Sandwich": {"price": 1.79, "shop": "Penny", "cat": "Backwaren"}, "Bio Zitrone": {"price": 1.49, "shop": "Penny", "cat": "Obst"}, "Sprühsahne 30%": {"price": 2.19, "shop": "Penny", "cat": "Milchprodukte"}, "Nuss Nougat Eis": {"price": 3.49, "shop": "Penny", "cat": "Süßigkeiten"}, "Doritos BBQ": {"price": 1.11, "shop": "Penny", "cat": "Trockenwaren"}, "Cola": {"price": 0.99, "shop": "Penny", "cat": "Getränke"}, "Rind Hack 500g": {"price": 4.33, "shop": "Aldi", "cat": "Fleisch&Fisch"}, "Mandarinen": {"price": 1.79, "shop": "Aldi", "cat": "Obst"}, "Sahnejoghurt": {"price": 2.19, "shop": "Aldi", "cat": "Milchprodukte"}, "Apfel rot": {"price": 3.29, "shop": "Lidl", "cat": "Obst"}, "Rustikales Baguette": {"price": 0.65, "shop": "Aldi", "cat": "Backwaren"}, "Feldsalat 150g": {"price": 1.49, "shop": "Aldi", "cat": "Gemüse"}, "Nussmischung": {"price": 3.49, "shop": "Aldi", "cat": "Trockenwaren"}, "Paprika rot": {"price": 2.45, "shop": "Aldi", "cat": "Gemüse"}, "Toffifee": {"price": 3.79, "shop": "Aldi", "cat": "Süßigkeiten"}, "Riesling feinherb": {"price": 2.79, "shop": "Aldi", "cat": "Alkoholische Getränke"}, "San Benedetto 1,5l": {"price": 0.79, "shop": "Aldi", "cat": "Getränke"}, "Haferflocken kernig": {"price": 0.69, "shop": "Aldi", "cat": "Trockenwaren"}, "Haferflocken zart": {"price": 0.69, "shop": "Aldi", "cat": "Trockenwaren"}, "Caffe Crema": {"price": 12.99, "shop": "Aldi", "cat": "Getränke"}, "Nuss-Nougat-Croissant": {"price": 0.69, "shop": "Aldi", "cat": "Backwaren"}, "Mineralwasser 500ml": {"price": 0.34, "shop": "Aldi", "cat": "Getränke"}, "Laugen Brioche": {"price": 1.99, "shop": "Aldi", "cat": "Backwaren"}, "Geflügel-Frischwurst": {"price": 1.29, "shop": "Aldi", "cat": "Fleisch&Fisch"}, "Dauerwurst-Aufschnitt": {"price": 1.69, "shop": "Aldi", "cat": "Fleisch&Fisch"}, "Rettertüte": {"price": 3.0, "shop": "Lidl", "cat": "Sonstiges"}, "Bio Zitronen": {"price": 1.49, "shop": "Lidl", "cat": "Obst"}, "Geflügel Mortadella": {"price": 0.89, "shop": "Lidl", "cat": "Fleisch&Fisch"}, "Butter": {"price": 1.19, "shop": "Lidl", "cat": "Milchprodukte"}, "Forellenfilets": {"price": 2.49, "shop": "Lidl", "cat": "Fleisch&Fisch"}, "Ziegenfrischkäse Natur": {"price": 1.99, "shop": "Lidl", "cat": "Milchprodukte"}, "Olivenöl": {"price": 5.99, "shop": "Lidl", "cat": "Sonstiges"}, "Eier Freiland XXL": {"price": 1.69, "shop": "Lidl", "cat": "Milchprodukte"}, "Remoulade": {"price": 0.75, "shop": "Lidl", "cat": "Sonstiges"}, "Brunchmix Brötchen": {"price": 1.49, "shop": "Lidl", "cat": "Backwaren"}, "Snack-Mandeln": {"price": 3.49, "shop": "Lidl", "cat": "Trockenwaren"}, "Hähnchen-Geschnetzeltes": {"price": 3.99, "shop": "Lidl", "cat": "Fleisch&Fisch"}, "Abtei Magnesium": {"price": 2.59, "shop": "Lidl", "cat": "Sonstiges"}, "dmBio Milch 3,5% 1L": {"price": 1.25, "shop": "DM", "cat": "Milchprodukte"}, "dmBio Schoko Reiswaffeln": {"price": 1.45, "shop": "DM", "cat": "Süßigkeiten"}, "dmBio Nuss-Nougat Creme": {"price": 2.95, "shop": "DM", "cat": "Süßigkeiten"}, "dmBio Pistaziencreme": {"price": 4.95, "shop": "DM", "cat": "Süßigkeiten"}, "dmBio Spirelli 500g": {"price": 0.85, "shop": "DM", "cat": "Trockenwaren"}, "dmBio Spaghetti 500g": {"price": 0.85, "shop": "DM", "cat": "Trockenwaren"}, "dmBio Penne 500g": {"price": 0.85, "shop": "DM", "cat": "Trockenwaren"}, "dmBio Tagliatelle 500g": {"price": 1.45, "shop": "DM", "cat": "Trockenwaren"}, "dmBio Weizenmehl Type": {"price": 0.85, "shop": "DM", "cat": "Trockenwaren"}, "dmBio Rohrohrzucker 1000g": {"price": 1.95, "shop": "DM", "cat": "Trockenwaren"}, "dmBio Cornflakes ungesüßt": {"price": 1.25, "shop": "DM", "cat": "Trockenwaren"}, "dmBio Passata 690g": {"price": 1.05, "shop": "DM", "cat": "Trockenwaren"}, "dmBio Haferflocken Feinblatt": {"price": 2.85, "shop": "DM", "cat": "Trockenwaren"}, "dmBio Haferflocken": {"price": 1.49, "shop": "DM", "cat": "Trockenwaren"}, "dmBio Kastanien Dinkelk.": {"price": 1.95, "shop": "DM", "cat": "Trockenwaren"}, "dmBio Nuss n Choc": {"price": 0.95, "shop": "DM", "cat": "Süßigkeiten"}, "dmBio Gelierzucker 500g": {"price": 2.45, "shop": "DM", "cat": "Trockenwaren"}, "dmBio Apfelessig 750ml": {"price": 1.55, "shop": "DM", "cat": "Sonstiges"}, "dmBio Passata 4x": {"price": 1.05, "shop": "DM", "cat": "Trockenwaren"}, "dmBio Mandel Drink 1l": {"price": 1.35, "shop": "DM", "cat": "Milchprodukte"}, "dmBio Birne-Erdb.Apfel": {"price": 0.75, "shop": "DM", "cat": "Getränke"}, "dmBio Haferdrink Zucke": {"price": 0.9, "shop": "DM", "cat": "Getränke"}, "dmBio Gemüsebrüh. h.Nac": {"price": 2.45, "shop": "DM", "cat": "Sonstiges"}, "FF Quetschie Apf.Erd.Blau": {"price": 0.95, "shop": "DM", "cat": "Süßigkeiten"}, "Dein Bestes Hundefutter Huhn": {"price": 0.75, "shop": "DM", "cat": "Hundefutter"}, "Dein Bestes Bio Hundefutter": {"price": 0.65, "shop": "DM", "cat": "Hundefutter"}, "dmBio mini Elisen Lebkuchen": {"price": 2.1, "shop": "DM", "cat": "Süßigkeiten"}, "Goldbesteckmuster Artd 400g": {"price": 1.15, "shop": "DM", "cat": "Sonstiges"}, "Saphir Meersalz 500g": {"price": 0.75, "shop": "DM", "cat": "Haushaltsartikel"}, "Saphir Meersalz mit Jod": {"price": 0.75, "shop": "DM", "cat": "Haushaltsartikel"}, "Saphir Kochsalz": {"price": 0.75, "shop": "DM", "cat": "Haushaltsartikel"}, "Ivorell Mineralwasser Still": {"price": 0.45, "shop": "DM", "cat": "Getränke"}, "Denkmit Spülmittel Lavendel": {"price": 0.95, "shop": "DM", "cat": "Haushaltsartikel"}, "Denkmit Hygienespüler": {"price": 1.25, "shop": "DM", "cat": "Haushaltsartikel"}, "Denkmit Oxi Energy": {"price": 2.25, "shop": "DM", "cat": "Waschmittel"}, "Denkmit Anti-Kalk-Gel": {"price": 2.45, "shop": "DM", "cat": "Haushaltsartikel"}, "Denkmit MGR Tabs XL": {"price": 4.49, "shop": "DM", "cat": "Haushaltsartikel"}, "Denkmit Klarspüler": {"price": 0.99, "shop": "DM", "cat": "Haushaltsartikel"}, "Denkmit Spezial-Salz": {"price": 0.8, "shop": "DM", "cat": "Haushaltsartikel"}, "Denkmit Oxi Power Weiss": {"price": 2.25, "shop": "DM", "cat": "Waschmittel"}, "Denkmit Fleckensalz": {"price": 1.15, "shop": "DM", "cat": "Waschmittel"}, "Denkmit Wollwaschmittel": {"price": 2.15, "shop": "DM", "cat": "Waschmittel"}, "Frosch Bio-Spiritus Reiniger": {"price": 2.25, "shop": "DM", "cat": "Haushaltsartikel"}, "Frosch Fettentferner": {"price": 2.25, "shop": "DM", "cat": "Haushaltsartikel"}, "Frosch Hygiene-Reiniger": {"price": 2.75, "shop": "DM", "cat": "Haushaltsartikel"}, "Isanamed Badesalz": {"price": 2.79, "shop": "DM", "cat": "Körperpflege"}, "Mivolis Totes Meer Badesalz": {"price": 2.65, "shop": "DM", "cat": "Körperpflege"}, "Mivolis Melatonin Spray": {"price": 3.45, "shop": "DM", "cat": "Körperpflege"}, "Visiomax Kombilösung 360ml": {"price": 4.95, "shop": "DM", "cat": "Körperpflege"}, "Lavera Zahncreme": {"price": 3.25, "shop": "DM", "cat": "Körperpflege"}, "Odol Zahnpasta": {"price": 1.1, "shop": "DM", "cat": "Körperpflege"}, "Isana Seife": {"price": 0.85, "shop": "DM", "cat": "Körperpflege"}, "Prof. Einmachgläser 230ml": {"price": 2.95, "shop": "DM", "cat": "Haushaltsartikel"}, "Ingwer Bio": {"price": 1.01, "shop": "Lidl", "cat": "Gemüse"}, "Stilles Wasser 0,5l": {"price": 0.29, "shop": "Lidl", "cat": "Getränke"}, "Orangensaft XXL": {"price": 2.99, "shop": "Lidl", "cat": "Getränke"}, "Softfrüchte Aprikose": {"price": 2.39, "shop": "Lidl", "cat": "Süßigkeiten"}, "Weizenbrötchen 8er": {"price": 1.19, "shop": "Lidl", "cat": "Backwaren"}, "Baguette Bauern": {"price": 0.79, "shop": "Lidl", "cat": "Backwaren"}, "Haselnüsse geröstet": {"price": 3.69, "shop": "Lidl", "cat": "Trockenwaren"}, "Dinkelsandwich": {"price": 1.69, "shop": "Lidl", "cat": "Backwaren"}, "Grobe Bratwurst": {"price": 7.99, "shop": "Lidl", "cat": "Fleisch&Fisch"}, "Banane Fair Bio": {"price": 2.9, "shop": "Lidl", "cat": "Obst"}, "Kürbis Hok Bio": {"price": 2.67, "shop": "Lidl", "cat": "Gemüse"}, "Ananas": {"price": 3.13, "shop": "Lidl", "cat": "Obst"}, "Bauernigurken": {"price": 2.99, "shop": "Lidl", "cat": "Gemüse"}, "Frischer O-Saft": {"price": 2.99, "shop": "Lidl", "cat": "Getränke"}, "Bio Sonnenblumenöl": {"price": 1.65, "shop": "Lidl", "cat": "Sonstiges"}, "Apfelschorle": {"price": 0.43, "shop": "Lidl", "cat": "Getränke"}, "Twix Doppelriegel": {"price": 0.99, "shop": "Lidl", "cat": "Süßigkeiten"}, "Walnusskerne XXL": {"price": 5.99, "shop": "Lidl", "cat": "Trockenwaren"}, "Oreo Kekse": {"price": 1.89, "shop": "Lidl", "cat": "Süßigkeiten"}, "Baguette Körner": {"price": 0.89, "shop": "Lidl", "cat": "Backwaren"}, "Abtei Vitamin D3": {"price": 2.95, "shop": "Lidl", "cat": "Körperpflege"}, "XXL Gr.Bratwurst QS": {"price": 5.99, "shop": "Lidl", "cat": "Fleisch&Fisch"}, "XXL Cevapcici": {"price": 6.99, "shop": "Lidl", "cat": "Fleisch&Fisch"}};
+
+// Katalog: BASE_CATALOG als Basis, aber gespeicherte Preisanpassungen haben dauerhaft Vorrang
+const savedCatalog = JSON.parse(localStorage.getItem("ek_catalog") || "{}");
+let catalog = {};
+// Erst alle BASE_CATALOG Einträge übernehmen
+Object.keys(BASE_CATALOG).forEach(name => {
+  catalog[name] = Object.assign({}, BASE_CATALOG[name]);
+});
+// Dann gespeicherte Preisanpassungen überschreiben — dauerhaft
+Object.keys(savedCatalog).forEach(name => {
+  if(catalog[name]) {
+    // Artikel existiert in BASE — nur Preis überschreiben, Rest behalten
+    catalog[name] = Object.assign({}, catalog[name], savedCatalog[name]);
+  } else {
+    // Neuer Artikel (manuell hinzugefügt)
+    catalog[name] = savedCatalog[name];
+  }
+});
+let list    = JSON.parse(localStorage.getItem("ek_list") || "[]");
+let week    = JSON.parse(localStorage.getItem("ek_week") || "{}");
+let modalMode = "new", editItemId = null, currentTab = "liste";
+let pickerDayIndex = null;
+
+const DAYS      = ["Mo","Di","Mi","Do","Fr","Sa","So"];
+const DAYS_LONG = ["Montag","Dienstag","Mittwoch","Donnerstag","Freitag","Samstag","Sonntag"];
+
+function saveCatalog() {
+  // Nur Abweichungen vom BASE_CATALOG speichern (spart Platz, bleibt sauber)
+  const overrides = {};
+  Object.keys(catalog).forEach(name => {
+    const base = BASE_CATALOG[name];
+    const current = catalog[name];
+    if(!base || base.price !== current.price) {
+      overrides[name] = current;
+    }
+  });
+  localStorage.setItem("ek_catalog", JSON.stringify(overrides));
+}
+function saveList()    { localStorage.setItem("ek_list",    JSON.stringify(list)); }
+function saveWeek()    { localStorage.setItem("ek_week",    JSON.stringify(week)); }
+
+// ── BUDGET ──
+let budget = parseFloat(localStorage.getItem("ek_budget") || "0");
+function saveBudget() {
+  const val = parseFloat(document.getElementById("budgetInp").value) || 0;
+  budget = val;
+  localStorage.setItem("ek_budget", budget);
+  closeBudgetModalDirect();
+  updateBudgetDisplay();
+  updateQuickBudgetSub();
+  showToast("Budget gespeichert: " + fmt(budget));
+}
+function openBudgetModal() {
+  document.getElementById("budgetInp").value = budget > 0 ? budget : "";
+  document.getElementById("budgetModalOverlay").style.display = "flex";
+  setTimeout(() => document.getElementById("budgetInp").focus(), 120);
+}
+function closeBudgetModal(e) { if(e.target===document.getElementById("budgetModalOverlay")) closeBudgetModalDirect(); }
+function closeBudgetModalDirect() { document.getElementById("budgetModalOverlay").style.display = "none"; }
+
+function updateBudgetDisplay() {
+  const total = list.reduce((s,i)=>s+getPrice(i.name)*(i.qty||1),0);
+  const budgetEl = document.getElementById("valBudget");
+  const barWrap = document.getElementById("budgetBarWrap");
+  if(budget <= 0) {
+    budgetEl.textContent = "— €";
+    budgetEl.className = "total-box-val";
+    barWrap.style.display = "none";
+    return;
+  }
+  const remaining = budget - total;
+  const pct = Math.min(100, (total / budget) * 100);
+  budgetEl.textContent = fmt(remaining < 0 ? Math.abs(remaining) : remaining) + (remaining < 0 ? " über!" : " rest");
+  budgetEl.className = "total-box-val" + (pct > 90 ? " danger" : pct > 70 ? " warn" : " mint");
+  barWrap.style.display = "block";
+  const fill = document.getElementById("budgetBarFill");
+  fill.style.width = pct + "%";
+  fill.style.background = pct > 90 ? "#E05555" : pct > 70 ? "#F5A623" : "var(--mint)";
+  document.getElementById("budgetBarLeft").textContent = fmt(total) + " ausgegeben";
+  document.getElementById("budgetBarPct").textContent = Math.round(pct) + "%";
+}
+
+// ── WOCHENPLAN VORSCHLAG ──
+function suggestWeekPlan() {
+  const weekBudget = budget > 0 ? budget : 100; // fallback 100€
+  const recipes = allRecipes().filter(r => r.zutaten.length > 0);
+
+  // Berechne Kosten pro Rezept
+  const costed = recipes.map(r => ({
+    ...r,
+    cost: r.zutaten.reduce((s,z)=>s+getPrice(z),0)
+  })).filter(r => r.cost > 0).sort((a,b) => a.cost - b.cost);
+
+  if(costed.length < 7) {
+    showToast("Zu wenige Rezepte mit Preisen!"); return;
+  }
+
+  // Greedy-Algorithmus: günstigste 7 die zusammen ins Budget passen
+  let plan = {};
+  let total = 0;
+  const perDay = weekBudget / 7;
+  const shuffled = [...costed].sort(() => Math.random() - 0.5); // etwas Zufall
+  const used = new Set();
+
+  for(let day = 0; day < 7; day++) {
+    // Finde passendes Rezept für diesen Tag (nicht zu teuer, noch nicht verwendet)
+    const remaining = weekBudget - total;
+    const maxForDay = Math.min(perDay * 1.5, remaining - (6-day) * (perDay * 0.5));
+    const candidates = shuffled.filter(r =>
+      !used.has(r.name) && r.cost <= Math.max(maxForDay, perDay * 0.8)
+    );
+    if(candidates.length === 0) {
+      // Nehme billigstes verfügbares
+      const fallback = costed.find(r => !used.has(r.name));
+      if(fallback) { plan[day] = fallback.name; used.add(fallback.name); total += fallback.cost; }
+    } else {
+      const pick = candidates[Math.floor(Math.random() * Math.min(5, candidates.length))];
+      plan[day] = pick.name; used.add(pick.name); total += pick.cost;
+    }
+  }
+
+  week = plan;
+  saveWeek();
+  renderWeek();
+  showToast(`✨ Wochenplan für ca. ${fmt(total)} erstellt!`);
+}
+
+
+function getPrice(n)   { const e=catalog[n]; return typeof e==="object"?(e?.price||0):(e||0); }
+function getShop(n)    { const e=catalog[n]; return typeof e==="object"?(e?.shop||""):""; }
+function fmt(n)        { return n.toFixed(2).replace(".",",")+" €"; }
+function getTodayIdx() { const d=new Date().getDay(); return d===0?6:d-1; }
+
+// ── TABS ──
+function switchTab(tab) {
+  currentTab = tab;
+  ["liste","rezepte","woche"].forEach(t => {
+    document.getElementById("view-"+t).style.display = t===tab ? "flex" : "none";
+    document.getElementById("tab-"+t).classList.toggle("active", t===tab);
+  });
+  document.getElementById("bottomBar").style.display = tab==="liste" ? "flex" : "none";
+  if(tab==="rezepte") renderRecipes();
+  if(tab==="woche") renderWeek();
+}
+
+// ── WOCHENPLAN ──
+function renderWeek() {
+  const today = getTodayIdx();
+  let totalCost = 0;
+  const html = DAYS.map((day, i) => {
+    const meal = week[i] || "";
+    const recipe = allRecipes().find(r=>r.name===meal);
+    const cost = recipe ? recipe.zutaten.reduce((s,z)=>s+getPrice(z),0) : 0;
+    if(cost>0) totalCost += cost;
+    const isToday = i===today;
+    return `<div class="day-card${isToday?" today":""}">
+      <div class="day-header">
+        <div class="day-name">${day}</div>
+        <div class="day-meal">
+          ${meal
+            ? `<div class="day-meal-name">${meal}</div>${cost>0?`<div style="font-size:0.68rem;color:var(--pale);margin-top:1px;">ca. ${fmt(cost)}</div>`:""}`
+            : `<div class="day-meal-empty">Noch nichts geplant</div>`
+          }
+        </div>
+        ${meal ? `<button class="del" onclick="removeWeekDay(${i})">\u2715</button>` : ""}
+        <button class="day-add-btn${meal?" set":""}" onclick="openPicker(${i})">${meal ? "\u270f\ufe0f" : "+ Rezept"}</button>
+      </div>
+    </div>`;
+  }).join("");
+  document.getElementById("weekContainer").innerHTML = html;
+  document.getElementById("weekCost").textContent = fmt(totalCost);
+}
+
+function removeWeekDay(i) { delete week[i]; saveWeek(); renderWeek(); }
+
+function weekToList() {
+  const filled = Object.values(week).filter(Boolean);
+  if(!filled.length) { showToast("Erst Rezepte für die Woche planen!"); return; }
+  let added = 0;
+  const seen = new Set();
+  filled.forEach(mealName => {
+    const recipe = allRecipes().find(r=>r.name===mealName);
+    if(!recipe) return;
+    recipe.zutaten.forEach(z => {
+      if(!seen.has(z) && !list.find(i=>i.name===z&&!i.done)) {
+        list.push({id:Date.now()+Math.random(),name:z,done:false,qty:1});
+        added++;
+      }
+      seen.add(z);
+    });
+  });
+  saveList(); switchTab("liste"); renderList();
+  showToast("\u2713 "+added+" Zutaten für die Woche auf Liste");
+}
+
+// ── REZEPT PICKER ──
+function openPicker(dayIdx) {
+  pickerDayIndex = dayIdx;
+  document.getElementById("pickerTitle").textContent = DAYS_LONG[dayIdx];
+  document.getElementById("pickerSearch").value = "";
+  document.getElementById("pickerOverlay").style.display = "flex";
+  renderPicker();
+  setTimeout(()=>document.getElementById("pickerSearch").focus(), 150);
+}
+function closePicker() {
+  document.getElementById("pickerOverlay").style.display = "none";
+  pickerDayIndex = null;
+}
+function renderPicker() {
+  const q = document.getElementById("pickerSearch").value.trim().toLowerCase();
+  const filtered = allRecipes().filter(r=>!q||r.name.toLowerCase().includes(q));
+  const current = week[pickerDayIndex];
+  let html = `<div class="picker-item none" onclick="clearPickerDay()">\u2014 Keines (leeren)</div>`;
+  html += filtered.map(r =>
+    `<div class="picker-item${r.name===current?" set":""}" onclick="selectRecipe('${encodeURIComponent(r.name)}')">${r.name}</div>`
+  ).join("");
+  document.getElementById("pickerList").innerHTML = html;
+}
+function clearPickerDay() {
+  if(pickerDayIndex!==null) delete week[pickerDayIndex];
+  saveWeek(); closePicker(); renderWeek();
+}
+function selectRecipe(enc) {
+  if(pickerDayIndex===null) return;
+  week[pickerDayIndex] = decodeURIComponent(enc);
+  saveWeek(); closePicker(); renderWeek();
+  showToast("\u2713 "+decodeURIComponent(enc)+" geplant");
+}
+
+// ── SUCHE LISTE ──
+document.getElementById("searchInp").addEventListener("input", function(){ renderSuggestions(this.value.trim()); });
+document.getElementById("searchInp").addEventListener("keydown", function(e){
+  if(e.key==="Enter"){ const v=this.value.trim(); if(v){ openAddModal(v); this.value=""; hideSug(); } }
+});
+
+function renderSuggestions(q) {
+  const box = document.getElementById("suggestions");
+  if(!q) { hideSug(); return; }
+  const matches = Object.keys(catalog).filter(n=>n.toLowerCase().includes(q.toLowerCase())).slice(0,8);
+  if(!matches.length) { hideSug(); return; }
+  box.innerHTML = matches.map(name => {
+    const p=getPrice(name), s=getShop(name);
+    const ps = p>0?`<span class="sug-price">${fmt(p)}</span>`:`<span class="sug-price free">kein Preis</span>`;
+    return `<div class="sug-item"><div class="sug-info"><div class="sug-name">${name}</div>${s?`<div class="sug-shop">${s}</div>`:""}</div>${ps}<button class="sug-add" onclick="addFromCatalog('${encodeURIComponent(name)}')">+ Liste</button></div>`;
+  }).join("");
+  box.style.display="block";
+}
+function hideSug() { document.getElementById("suggestions").style.display="none"; }
+
+function addFromCatalog(enc) {
+  const name=decodeURIComponent(enc);
+  const qty=parseInt(document.getElementById("modalQty").value)||1;
+    list.push({id:Date.now(),name,done:false,qty});
+  saveList(); renderList(); hideSug();
+  document.getElementById("searchInp").value="";
+  showToast("✓ "+name+" hinzugefügt");
+}
+
+// ── REZEPTE ──
+let customRecipes = JSON.parse(localStorage.getItem("ek_custom_recipes") || "[]");
+function saveCustomRecipes() { localStorage.setItem("ek_custom_recipes", JSON.stringify(customRecipes)); }
+function allRecipes() { return [...RECIPES, ...customRecipes]; }
+
+let editingRecipeName = null;
+
+function openNewRecipeModal() {
+  editingRecipeName = null;
+  document.getElementById("recipeModalTitle").textContent = "Neues Rezept";
+  document.getElementById("recipeModalOk").textContent = "Speichern";
+  document.getElementById("recipeModalName").value = "";
+  document.getElementById("recipeModalTags").value = "";
+  document.getElementById("recipeModalZutaten").value = "";
+  document.getElementById("recipeModalOverlay").style.display = "flex";
+  setTimeout(() => document.getElementById("recipeModalName").focus(), 120);
+}
+
+function editRecipe(enc) {
+  const name = decodeURIComponent(enc);
+  const r = customRecipes.find(r=>r.name===name);
+  if(!r) return;
+  editingRecipeName = name;
+  document.getElementById("recipeModalTitle").textContent = "Rezept bearbeiten";
+  document.getElementById("recipeModalOk").textContent = "Aktualisieren";
+  document.getElementById("recipeModalName").value = r.name;
+  document.getElementById("recipeModalTags").value = r.tags || "";
+  document.getElementById("recipeModalZutaten").value = r.zutaten.join(", ");
+  document.getElementById("recipeModalOverlay").style.display = "flex";
+  setTimeout(() => document.getElementById("recipeModalName").focus(), 120);
+}
+
+function saveNewRecipe() {
+  const name = document.getElementById("recipeModalName").value.trim();
+  if(!name) { document.getElementById("recipeModalName").focus(); return; }
+  const tags = document.getElementById("recipeModalTags").value.trim();
+  const zutatenRaw = document.getElementById("recipeModalZutaten").value.trim();
+  const zutaten = zutatenRaw ? zutatenRaw.split(",").map(z=>z.trim()).filter(Boolean) : [];
+
+  if(editingRecipeName) {
+    const idx = customRecipes.findIndex(r=>r.name===editingRecipeName);
+    if(idx>=0) customRecipes[idx] = {name, tags, zutaten, custom: true};
+  } else {
+    if(allRecipes().find(r=>r.name===name)) { showToast("Rezept existiert bereits!"); return; }
+    customRecipes.push({name, tags, zutaten, custom: true});
+  }
+  saveCustomRecipes();
+  closeRecipeModalDirect();
+  renderRecipes();
+  showToast(editingRecipeName ? "✓ Rezept aktualisiert" : "✓ "+name+" gespeichert");
+}
+
+function deleteRecipe(enc) {
+  const name = decodeURIComponent(enc);
+  customRecipes = customRecipes.filter(r=>r.name!==name);
+  saveCustomRecipes();
+  renderRecipes();
+  showToast("Rezept gelöscht");
+}
+
+function closeRecipeModal(e) { if(e.target===document.getElementById("recipeModalOverlay")) closeRecipeModalDirect(); }
+function closeRecipeModalDirect() { document.getElementById("recipeModalOverlay").style.display="none"; }
+
+function renderRecipes() {
+  const q = document.getElementById("recipeSearch").value.trim().toLowerCase();
+  const all = allRecipes();
+  const filtered = all.filter(r => !q || r.name.toLowerCase().includes(q) || (r.tags||"").toLowerCase().includes(q));
+  const container = document.getElementById("scrollRecipes");
+  if(!filtered.length) {
+    container.innerHTML=`<div class="empty"><div class="empty-icon">🍽</div><p>Kein Rezept gefunden.<br><strong>Tippe oben auf + Neu</strong><br>um dein erstes Rezept anzulegen!</p></div>`; return;
+  }
+  container.innerHTML = filtered.map(r => {
+    const cost = r.zutaten.reduce((s,z)=>s+getPrice(z),0);
+    const tags = r.tags ? r.tags.split(",").map(t=>`<span class="recipe-tag">${t.trim()}</span>`).join("") : "";
+    const zList = r.zutaten.join(" · ");
+    return `<div class="recipe-card">
+      <div style="display:flex;align-items:flex-start;gap:8px">
+        <div style="flex:1">
+          <div class="recipe-name">${r.name}</div>
+          ${tags ? `<div class="recipe-tags">${tags}</div>` : ""}
+          ${zList ? `<div class="recipe-zutaten">${zList}</div>` : ""}
+          ${cost>0 ? `<div class="recipe-cost">ca. ${fmt(cost)}</div>` : ""}
+        </div>
+        <button class="recipe-add-btn" onclick="addRecipeToList('${encodeURIComponent(r.name)}')">+ Einkauf</button>
+      </div>
+      ${r.custom ? `<div style="margin-top:8px;display:flex;gap:6px">
+        <button onclick="editRecipe('${encodeURIComponent(r.name)}')" style="background:none;border:1px solid var(--line);border-radius:6px;padding:4px 10px;font-size:0.72rem;color:var(--pale);cursor:pointer;">✏️ Bearbeiten</button>
+        <button onclick="deleteRecipe('${encodeURIComponent(r.name)}')" style="background:none;border:1px solid var(--line);border-radius:6px;padding:4px 10px;font-size:0.72rem;color:var(--pale);cursor:pointer;">🗑 Löschen</button>
+      </div>` : ""}
+    </div>`;
+  }).join("");
+}
+
+function addRecipeToList(enc) {
+  const name = decodeURIComponent(enc);
+  const recipe = allRecipes().find(r=>r.name===name);
+  if(!recipe) return;
+  let added=0;
+  recipe.zutaten.forEach(z => {
+    if(!list.find(i=>i.name===z && !i.done)) {
+      list.push({id:Date.now()+Math.random(),name:z,done:false,qty:1});
+      added++;
+    }
+  });
+  saveList();
+  switchTab("liste");
+  renderList();
+  showToast(`✓ ${recipe.name} → ${added} Zutaten auf Liste`);
+}
+
+// ── MODAL ──
+function openAddModal(prefill) {
+  modalMode="new";
+  document.getElementById("modalTitle").textContent="Neuer Artikel";
+  document.getElementById("modalSub").textContent="Preis wird gespeichert";
+  document.getElementById("modalOk").textContent="Hinzufügen";
+  document.getElementById("modalName").value=prefill||"";
+  document.getElementById("modalName").disabled=false;
+  const ep=prefill?getPrice(prefill):0;
+  document.getElementById("modalPrice").value=ep>0?ep:"";
+  document.getElementById("modalOverlay").style.display="flex";
+  setTimeout(()=>document.getElementById(prefill?"modalPrice":"modalName").focus(),120);
+}
+function openPriceModal(id) {
+  const item=list.find(i=>i.id===id); if(!item) return;
+  modalMode="edit-price"; editItemId=id;
+  const p=getPrice(item.name), s=getShop(item.name);
+  document.getElementById("modalTitle").textContent=item.name;
+  const subParts = [];
+  if(s) subParts.push("Zuletzt bei "+s);
+  if(p>0) subParts.push(fmt(p)+" / Stück");
+  document.getElementById("modalSub").textContent=subParts.length?subParts.join(" · "):"Preis & Anzahl anpassen";
+  document.getElementById("modalOk").textContent="Speichern";
+  document.getElementById("modalName").value=item.name;
+  document.getElementById("modalName").disabled=true;
+  document.getElementById("modalPrice").value=p>0?p:"";
+  document.getElementById("modalQty").value=item.qty||1;
+  document.getElementById("modalOverlay").style.display="flex";
+  setTimeout(()=>document.getElementById("modalPrice").focus(),120);
+}
+function closeModal(e) { if(e.target===document.getElementById("modalOverlay")) closeModalDirect(); }
+function closeModalDirect() { document.getElementById("modalOverlay").style.display="none"; }
+function modalOk() {
+  if(modalMode==="new") {
+    const name=document.getElementById("modalName").value.trim();
+    if(!name) { document.getElementById("modalName").focus(); return; }
+    const price=parseFloat(document.getElementById("modalPrice").value)||0;
+    const qty=parseInt(document.getElementById("modalQty").value)||1;
+    if(price>0||!catalog[name]) { catalog[name]={price,shop:catalog[name]?.shop||"",cat:catalog[name]?.cat||""}; saveCatalog(); }
+    list.push({id:Date.now(),name,done:false,qty});
+    saveList(); renderList(); closeModalDirect();
+    showToast("✓ "+name+" hinzugefügt");
+    document.getElementById("searchInp").value="";
+  } else {
+    const price=parseFloat(document.getElementById("modalPrice").value)||0;
+    const item=list.find(i=>i.id===editItemId);
+    if(item) { catalog[item.name]={price,shop:catalog[item.name]?.shop||"",cat:catalog[item.name]?.cat||""}; item.qty=parseInt(document.getElementById("modalQty").value)||1; saveCatalog(); saveList(); renderList(); showToast("Gespeichert ✓"); }
+    closeModalDirect();
+  }
+}
+
+// ── LISTE AKTIONEN ──
+function toggleDone(id) { const i=list.find(i=>i.id===id); if(i) i.done=!i.done; saveList(); renderList(); }
+function deleteItem(id) { list=list.filter(i=>i.id!==id); saveList(); renderList(); }
+function clearDone() { list=list.filter(i=>!i.done); saveList(); renderList(); showToast("Erledigte entfernt"); }
+function resetChecks() { list.forEach(i=>i.done=false); saveList(); renderList(); showToast("Bereit für neuen Einkauf ✓"); }
+
+// ── RENDER LISTE ──
+function renderList() {
+  const total=list.reduce((s,i)=>s+getPrice(i.name)*(i.qty||1),0);
+  const done=list.filter(i=>i.done).reduce((s,i)=>s+getPrice(i.name)*(i.qty||1),0);
+  document.getElementById("valTotal").textContent=fmt(total);
+  document.getElementById("valDone").textContent=fmt(done);
+  updateBudgetDisplay();
+  const c=document.getElementById("scrollList");
+  if(!list.length) {
+    c.innerHTML=`<div class="empty"><div class="empty-icon">🛒</div><p>Suche nach Artikeln<br>oder wähle ein <strong>Rezept</strong><br>um Zutaten direkt hinzuzufügen!</p></div>`; return;
+  }
+  const open=list.filter(i=>!i.done), done2=list.filter(i=>i.done);
+  let html="";
+  if(open.length) {
+    html+=`<div class="sec-head"><span>OFFEN</span><span>${fmt(open.reduce((s,i)=>s+getPrice(i.name)*(i.qty||1),0))}</span></div>`;
+    html+=open.map(itemHTML).join("");
+  }
+  if(done2.length) {
+    html+=`<div class="sec-head"><span>ERLEDIGT</span><span>${fmt(done2.reduce((s,i)=>s+getPrice(i.name)*(i.qty||1),0))}</span></div>`;
+    html+=done2.map(itemHTML).join("");
+  }
+  c.innerHTML=html;
+}
+
+function itemHTML(item) {
+  const p=getPrice(item.name), s=getShop(item.name), q=item.qty||1;
+  const lineTotal=p*q;
+  const priceLabel = lineTotal>0
+    ? `<button class="price-btn" onclick="openPriceModal(${item.id})">${fmt(lineTotal)}</button>`
+    : `<button class="price-btn free" onclick="openPriceModal(${item.id})">Preis?</button>`;
+  const unitHint = q>1 && p>0 ? `<div class="item-shop">${fmt(p)} / Stück${s?' · '+s:''}</div>` : (s?`<div class="item-shop">${s}</div>`:'');
+  return `<div class="item ${item.done?"done":""}">
+    <div class="check" onclick="toggleDone(${item.id})">${item.done?"✓":""}</div>
+    <div class="item-body">
+      <div class="item-name">${item.name}</div>
+      ${unitHint}
+    </div>
+    <div class="item-qty">
+      <button class="qty-btn" onclick="changeQty(${item.id},-1)">−</button>
+      <span class="qty-num">${q}×</span>
+      <button class="qty-btn" onclick="changeQty(${item.id},1)">+</button>
+    </div>
+    ${priceLabel}
+    <button class="del" onclick="deleteItem(${item.id})">✕</button>
+  </div>`;
+}
+
+function changeQty(id, delta) {
+  const item=list.find(i=>i.id===id); if(!item) return;
+  item.qty=Math.max(1,(item.qty||1)+delta);
+  saveList(); renderList();
+}
+
+function showToast(msg) {
+  const t=document.getElementById("toast");
+  t.textContent=msg; t.classList.add("show");
+  setTimeout(()=>t.classList.remove("show"),2400);
+}
+
+document.getElementById("modalPrice").addEventListener("keydown",e=>{if(e.key==="Enter")modalOk();});
+document.getElementById("modalName").addEventListener("keydown",e=>{if(e.key==="Enter")document.getElementById("modalPrice").focus();});
+
+
+// ── KONFIGURATION ──
+// Optional: Trage hier deinen Anthropic API Key ein für den Belegscanner
+// Hole dir einen Key auf: https://console.anthropic.com
+// WICHTIG: Nie den echten Key in GitHub einchecken!
+const ANTHROPIC_API_KEY = localStorage.getItem('ik_api_key') || '';
+
+// ── BELEGSCANNER ──
+let scanImageBase64 = null;
+let scanResults = [];
+
+function openScanner() {
+  document.getElementById('scannerOverlay').style.display = 'flex';
+  scanImageBase64 = null;
+  scanResults = [];
+  document.getElementById('scannerPreview').innerHTML = `<div class="scanner-placeholder"><div class="scanner-placeholder-icon">🧾</div><p>Kassierbon fotografieren oder<br>aus Fotos auswählen</p></div>`;
+  document.getElementById('scannerResult').style.display = 'none';
+  document.getElementById('btnScanSave').style.display = 'none';
+  document.getElementById('btnAnalyze').disabled = true;
+  document.getElementById('analyzeLabel').textContent = '✨ Analysieren';
+}
+
+function closeScanner() {
+  document.getElementById('scannerOverlay').style.display = 'none';
+}
+
+function onImageSelected(event) {
+  const file = event.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const dataUrl = e.target.result;
+    scanImageBase64 = dataUrl.split(',')[1];
+    document.getElementById('scannerPreview').innerHTML = `<img src="${dataUrl}" alt="Bon"/>`;
+    document.getElementById('btnAnalyze').disabled = false;
+  };
+  reader.readAsDataURL(file);
+  event.target.value = '';
+}
+
+async function analyzeReceipt() {
+  if(!scanImageBase64) return;
+  const btn = document.getElementById('btnAnalyze');
+  const label = document.getElementById('analyzeLabel');
+  btn.disabled = true;
+  label.textContent = '⏳ Wird analysiert…';
+
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...(ANTHROPIC_API_KEY ? {'x-api-key': ANTHROPIC_API_KEY} : {}) },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        system: 'Du bist ein Kassierbon-Analysator. Extrahiere alle Lebensmittel und Drogerieartikel aus dem Bild. Antworte NUR mit einem JSON-Array ohne Markdown, z.B.: [{"name":"Bananen","price":1.09,"shop":"Lidl"},{"name":"Milch","price":1.25,"shop":"DM"}]. Benutze den Geschäftsnamen aus dem Bon. Ignoriere Pfand, Rabatte, Summen. Nur echte Artikel mit Preis.',
+        messages: [{
+          role: 'user',
+          content: [{
+            type: 'image',
+            source: { type: 'base64', media_type: 'image/jpeg', data: scanImageBase64 }
+          }, {
+            type: 'text',
+            text: 'Analysiere diesen Kassierbon und gib mir alle Artikel als JSON zurück.'
+          }]
+        }]
+      })
+    });
+
+    const data = await response.json();
+    const text = data.content?.[0]?.text || '[]';
+    const clean = text.replace(/```json|```/g, '').trim();
+    scanResults = JSON.parse(clean);
+
+    const resultBox = document.getElementById('scannerResult');
+    if(scanResults.length === 0) {
+      resultBox.innerHTML = '<p style="color:var(--pale);text-align:center;padding:10px;">Keine Artikel erkannt.</p>';
+    } else {
+      resultBox.innerHTML = scanResults.map(item => `
+        <div class="scanner-result-item">
+          <div>
+            <div class="scanner-result-name">${item.name}</div>
+            <div class="scanner-result-shop">${item.shop || ''}</div>
+          </div>
+          <div class="scanner-result-price">${item.price?.toFixed(2).replace('.',',')} €</div>
+        </div>`).join('');
+      document.getElementById('btnScanSave').style.display = 'block';
+    }
+    resultBox.style.display = 'block';
+    label.textContent = `✓ ${scanResults.length} Artikel`;
+
+  } catch(err) {
+    label.textContent = '⚠ Fehler';
+    btn.disabled = false;
+    showToast('Fehler bei der Analyse');
+    console.error(err);
+  }
+}
+
+function saveScanResults() {
+  let saved = 0;
+  scanResults.forEach(item => {
+    if(item.name && item.price > 0) {
+      const cat = catalog[item.name]?.cat || 'Sonstiges';
+      catalog[item.name] = { price: item.price, shop: item.shop || '', cat };
+      saved++;
+    }
+  });
+  saveCatalog();
+  showToast(`✅ ${saved} Preise gespeichert!`);
+  closeScanner();
+}
+
+// ── SCHNELL KOCHEN ──
+function openQuickCook() {
+  document.getElementById('quickcookOverlay').style.display = 'flex';
+  document.getElementById('quickcookSearch').value = '';
+  renderQuickCook();
+  setTimeout(() => document.getElementById('quickcookSearch').focus(), 150);
+}
+function closeQuickCook() {
+  document.getElementById('quickcookOverlay').style.display = 'none';
+}
+function renderQuickCook() {
+  const q = document.getElementById('quickcookSearch').value.trim().toLowerCase();
+  const all = allRecipes();
+  const filtered = all.filter(r => !q || r.name.toLowerCase().includes(q));
+  document.getElementById('quickcookList').innerHTML = filtered.map(r => {
+    const cost = r.zutaten.reduce((s,z)=>s+getPrice(z),0);
+    return `<div class="quickcook-item">
+      <div class="quickcook-item-info">
+        <div class="quickcook-item-name">${r.name}</div>
+        ${cost>0 ? `<div class="quickcook-item-cost">ca. ${fmt(cost)}</div>` : ''}
+      </div>
+      <button class="quickcook-add" onclick="quickCookAdd('${encodeURIComponent(r.name)}')">+ Liste</button>
+    </div>`;
+  }).join('');
+}
+function quickCookAdd(enc) {
+  const name = decodeURIComponent(enc);
+  const recipe = allRecipes().find(r=>r.name===name);
+  if(!recipe) return;
+  let added = 0;
+  recipe.zutaten.forEach(z => {
+    if(!list.find(i=>i.name===z&&!i.done)) {
+      list.push({id:Date.now()+Math.random(),name:z,done:false,qty:1});
+      added++;
+    }
+  });
+  saveList();
+  closeQuickCook();
+  switchTab('liste');
+  renderList();
+  showToast(`✓ ${recipe.name} → ${added} Zutaten auf Liste`);
+}
+
+// Update budget quick button subtitle
+function updateQuickBudgetSub() {
+  const sub = document.getElementById('quickBudgetSub');
+  if(!sub) return;
+  sub.textContent = budget > 0 ? `Budget: ${fmt(budget)}` : 'Wochenplan aus Budget';
+}
+
+renderList();
+renderRecipes();
+updateBudgetDisplay();
+updateQuickBudgetSub();
+// Zeige Install-Banner wenn noch nicht als PWA installiert
+setTimeout(() => {
+  const isStandalone = window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
+  const dismissed = localStorage.getItem('ik_installed');
+  if(!isStandalone && !dismissed) {
+    document.getElementById('installBanner').style.display = 'block';
+  }
+}, 2000);
+</script>
+
+<!-- SCANNER MODAL -->
+<div class="scanner-overlay" id="scannerOverlay">
+  <div class="scanner-header">
+    <div class="scanner-title"><svg width="18" height="18" class=""><use href="#ico-camera"/></svg> Bon scannen</div>
+    <button class="scanner-close" onclick="closeScanner()">✕</button>
+  </div>
+  <div class="scanner-body">
+    <div class="scanner-preview" id="scannerPreview">
+      <div class="scanner-placeholder">
+        <div class="scanner-placeholder-icon">🧾</div>
+        <p>Kassierbon fotografieren oder<br>aus Fotos auswählen</p>
+      </div>
+    </div>
+    <div class="scanner-actions">
+      <button class="btn-scan-upload" onclick="document.getElementById('scanInput').click()">📁 Foto wählen</button>
+      <button class="btn-scan-analyze" id="btnAnalyze" onclick="analyzeReceipt()" disabled>
+        <span id="analyzeLabel">✨ Analysieren</span>
+      </button>
+    </div>
+    <div class="scanner-result" id="scannerResult" style="display:none;"></div>
+    <button class="btn-scan-save" id="btnScanSave" onclick="saveScanResults()" style="display:none;">
+      ✅ Preise in Datenbank speichern
+    </button>
+  </div>
+  <input type="file" id="scanInput" accept="image/*" capture="environment" style="display:none;" onchange="onImageSelected(event)"/>
+</div>
+
+<!-- QUICK COOK MODAL -->
+<div class="quickcook-overlay" id="quickcookOverlay">
+  <div class="quickcook-box">
+    <div class="quickcook-head">
+      <div class="quickcook-title"><svg width="18" height="18" class=""><use href="#ico-pot"/></svg> Was kochst du heute?</div>
+      <button class="quickcook-close" onclick="closeQuickCook()">✕</button>
+    </div>
+    <div class="quickcook-search">
+      <input class="quickcook-inp" id="quickcookSearch" placeholder="Rezept suchen…" autocomplete="off" autocorrect="off" oninput="renderQuickCook()"/>
+    </div>
+    <div class="quickcook-list" id="quickcookList"></div>
+  </div>
+</div>
+
+<div id="installBanner" style="display:none;position:fixed;bottom:calc(76px + var(--safe-bottom));left:12px;right:12px;background:var(--dark);color:white;border-radius:14px;padding:14px 16px;z-index:500;box-shadow:0 4px 20px rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.1);">
+  <div style="display:flex;align-items:center;gap:12px;">
+    <div style="font-size:1.8rem;flex-shrink:0;">🍳</div>
+    <div style="flex:1;">
+      <div style="font-family:'Playfair Display',serif;font-size:0.9rem;margin-bottom:2px;">Als App speichern</div>
+      <div style="font-size:0.72rem;color:#AAA;line-height:1.4;">Tippe auf <strong style="color:white;">Teilen</strong> → <strong style="color:white;">Zum Home-Bildschirm</strong> für die beste Erfahrung</div>
+    </div>
+    <button onclick="document.getElementById('installBanner').style.display='none';localStorage.setItem('ik_installed','1')" style="background:none;border:none;color:#AAA;font-size:1.2rem;cursor:pointer;padding:4px;">✕</button>
+  </div>
+</div>
+</body>
+</html>
