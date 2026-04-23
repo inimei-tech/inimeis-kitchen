@@ -52,4 +52,4 @@ Auch dafür gerne ein Issue öffnen mit dem Label `enhancement`.
 
 ## Fragen?
 
-📬 [inimei.de](https://inimei.de) oder GitHub Issues
+📬 [inimeiskitchen.com](https://inimeiskitchen.com) oder GitHub Issues
