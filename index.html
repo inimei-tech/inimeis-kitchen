@@ -65,7 +65,8 @@ header{background:var(--dark);padding:calc(var(--safe-top) + 16px) 20px 14px;fle
 
 /* SUGGESTIONS */
 .suggestions{background:var(--white);border-bottom:1px solid var(--line);max-height:200px;overflow-y:auto;flex-shrink:0;display:none;}
-.sug-item{display:flex;align-items:center;padding:10px 16px;border-bottom:1px solid var(--line);gap:10px;}
+.sug-item{display:flex;align-items:center;padding:10px 16px;border-bottom:1px solid var(--line);gap:8px;cursor:pointer;}
+.sug-item:active{background:var(--bg);}
 .sug-item:last-child{border-bottom:none;}
 .sug-info{flex:1;min-width:0;}
 .sug-name{font-size:0.88rem;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
@@ -208,7 +209,7 @@ header{background:var(--dark);padding:calc(var(--safe-top) + 16px) 20px 14px;fle
 .quickcook-add{background:var(--dark);color:white;border:none;border-radius:8px;padding:7px 14px;font-size:0.78rem;font-weight:600;cursor:pointer;flex-shrink:0;}
 
 /* BOTTOM */
-.bottom-bar{position:fixed;bottom:0;left:0;right:0;background:var(--white);border-top:1px solid var(--line);padding:10px 14px calc(10px + var(--safe-bottom));display:flex;gap:8px;z-index:50;}
+.bottom-bar{position:fixed;bottom:0;left:0;right:0;background:var(--white);border-top:1px solid var(--line);padding:10px 14px calc(10px + var(--safe-bottom));display:flex;gap:8px;z-index:100;}
 .btn-bot{flex:1;padding:11px;border-radius:10px;font-family:"DM Sans",sans-serif;font-size:0.8rem;font-weight:600;cursor:pointer;border:1.5px solid var(--line);background:none;color:var(--pale);display:flex;align-items:center;justify-content:center;gap:6px;}
 .btn-bot:active{border-color:var(--bx);color:var(--bx);}
 .btn-bot.primary{background:var(--dark);color:white;border-color:var(--dark);flex:2;}
@@ -409,8 +410,42 @@ self.addEventListener('fetch', e => {
     <h3 id="modalTitle">Neuer Artikel</h3>
     <p class="modal-sub" id="modalSub"></p>
     <input class="modal-inp" id="modalName" placeholder="Artikelname" autocorrect="off"/>
-    <input class="modal-inp" type="number" id="modalPrice" placeholder="Preis pro Stück in € (z.B. 0.25)" step="0.01" min="0"/>
-<input class="modal-inp" type="number" id="modalQty" placeholder="Anzahl (z.B. 6)" step="1" min="1" value="1"/>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;">
+      <input class="modal-inp" type="number" id="modalPrice" placeholder="Preis (€)" step="0.01" min="0" style="margin-bottom:0;"/>
+      <input class="modal-inp" type="number" id="modalQty" placeholder="Anzahl" step="1" min="1" value="1" style="margin-bottom:0;"/>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;">
+      <input class="modal-inp" id="modalUnit" placeholder="Einheit (g, ml, Stk...)" autocorrect="off" style="margin-bottom:0;"/>
+      <select class="modal-inp" id="modalShop" style="margin-bottom:0;">
+        <option value="">Markt wählen</option>
+        <option value="Aldi">Aldi</option>
+        <option value="Lidl">Lidl</option>
+        <option value="Penny">Penny</option>
+        <option value="Rewe">Rewe</option>
+        <option value="DM">DM</option>
+        <option value="Rossmann">Rossmann</option>
+        <option value="Norma">Norma</option>
+        <option value="Edeka">Edeka</option>
+        <option value="Sonstiges">Sonstiges</option>
+      </select>
+    </div>
+    <select class="modal-inp" id="modalCat">
+      <option value="Sonstiges">Kategorie wählen</option>
+      <option value="Gemüse">Gemüse</option>
+      <option value="Obst">Obst</option>
+      <option value="Milchprodukte">Milchprodukte</option>
+      <option value="Fleisch&Fisch">Fleisch & Fisch</option>
+      <option value="Backwaren">Backwaren</option>
+      <option value="Trockenwaren">Trockenwaren</option>
+      <option value="Getränke">Getränke</option>
+      <option value="Süßigkeiten">Süßigkeiten</option>
+      <option value="Drogerie">Drogerie</option>
+      <option value="Kosmetik">Kosmetik</option>
+      <option value="Haushaltsartikel">Haushaltsartikel</option>
+      <option value="Kleidung">Kleidung</option>
+      <option value="Freizeit">Freizeit</option>
+      <option value="Sonstiges">Sonstiges</option>
+    </select>
     <div class="modal-row">
       <button class="btn-cancel" onclick="closeModalDirect()">Abbrechen</button>
       <button class="btn-ok" id="modalOk" onclick="modalOk()">Hinzufügen</button>
@@ -471,7 +506,8 @@ self.addEventListener('fetch', e => {
     <p class="modal-sub">Zutaten mit Komma trennen, z.B.: Pasta, Tomaten, Zwiebeln</p>
     <input class="modal-inp" id="recipeModalName" placeholder="Rezeptname" autocorrect="off"/>
     <input class="modal-inp" id="recipeModalTags" placeholder="Tags (z.B. Schnell, Gesund)" autocorrect="off"/>
-    <textarea class="modal-inp" id="recipeModalZutaten" placeholder="Zutaten (kommasepariert)" rows="3" style="resize:none;height:80px;"></textarea>
+    <textarea class="modal-inp" id="recipeModalZutaten" placeholder="Zutaten (kommasepariert, z.B.: 500g Hackfleisch, 2 Zwiebeln, 400ml Sahne)" rows="4" style="resize:none;height:100px;"></textarea>
+    <p style="font-size:0.7rem;color:var(--pale);margin-bottom:10px;">Tipp: Gramm/Menge direkt beim Namen angeben, z.B. "500g Mehl"</p>
     <div class="modal-row">
       <button class="btn-cancel" onclick="closeRecipeModalDirect()">Abbrechen</button>
       <button class="btn-ok" id="recipeModalOk" onclick="saveNewRecipe()">Speichern</button>
@@ -511,12 +547,17 @@ const DAYS      = ["Mo","Di","Mi","Do","Fr","Sa","So"];
 const DAYS_LONG = ["Montag","Dienstag","Mittwoch","Donnerstag","Freitag","Samstag","Sonntag"];
 
 function saveCatalog() {
-  // Nur Abweichungen vom BASE_CATALOG speichern (spart Platz, bleibt sauber)
+  // Speichere ALLE Änderungen — shop, cat, unit, price
   const overrides = {};
   Object.keys(catalog).forEach(name => {
     const base = BASE_CATALOG[name];
     const current = catalog[name];
-    if(!base || base.price !== current.price) {
+    // Immer speichern wenn nicht im BASE_CATALOG oder wenn sich etwas geändert hat
+    if(!base || 
+       base.price !== current.price || 
+       (base.shop||"") !== (current.shop||"") ||
+       (base.cat||"") !== (current.cat||"") ||
+       (current.unit)) {
       overrides[name] = current;
     }
   });
@@ -661,23 +702,37 @@ function renderWeek() {
 function removeWeekDay(i) { delete week[i]; saveWeek(); renderWeek(); }
 
 function weekToList() {
-  const filled = Object.values(week).filter(Boolean);
+  const filled = Object.entries(week).filter(([,v])=>v);
   if(!filled.length) { showToast("Erst Rezepte für die Woche planen!"); return; }
+  
+  // Nach Tagen sortiert Mo→So
+  filled.sort((a,b) => parseInt(a[0]) - parseInt(b[0]));
+  
   let added = 0;
   const seen = new Set();
-  filled.forEach(mealName => {
+  
+  filled.forEach(([dayIdx, mealName]) => {
     const recipe = allRecipes().find(r=>r.name===mealName);
     if(!recipe) return;
+    const dayLabel = DAYS[parseInt(dayIdx)]; // Mo, Di, etc.
     recipe.zutaten.forEach(z => {
       if(!seen.has(z) && !list.find(i=>i.name===z&&!i.done)) {
-        list.push({id:Date.now()+Math.random(),name:z,done:false,qty:1});
+        list.push({
+          id: Date.now()+Math.random(),
+          name: z,
+          done: false,
+          qty: 1,
+          unit: catalog[z]?.unit||"",
+          day: dayLabel  // Tag-Label für die Liste
+        });
         added++;
       }
       seen.add(z);
     });
   });
+  
   saveList(); switchTab("liste"); renderList();
-  showToast("\u2713 "+added+" Zutaten für die Woche auf Liste");
+  showToast("✓ "+added+" Zutaten für die Woche auf Liste");
 }
 
 // ── REZEPT PICKER ──
@@ -727,8 +782,18 @@ function renderSuggestions(q) {
   if(!matches.length) { hideSug(); return; }
   box.innerHTML = matches.map(name => {
     const p=getPrice(name), s=getShop(name);
+    const u=catalog[name]?.unit||"";
     const ps = p>0?`<span class="sug-price">${fmt(p)}</span>`:`<span class="sug-price free">kein Preis</span>`;
-    return `<div class="sug-item"><div class="sug-info"><div class="sug-name">${name}</div>${s?`<div class="sug-shop">${s}</div>`:""}</div>${ps}<button class="sug-add" onclick="addFromCatalog('${encodeURIComponent(name)}')">+ Liste</button></div>`;
+    const meta = [s,u].filter(Boolean).join(" · ");
+    return `<div class="sug-item" onclick="addFromCatalog('${encodeURIComponent(name)}')">
+      <div class="sug-info">
+        <div class="sug-name">${name}</div>
+        ${meta?`<div class="sug-shop">${meta}</div>`:""}
+      </div>
+      ${ps}
+      <button class="sug-add" onclick="event.stopPropagation();openAddModal('${encodeURIComponent(name)}')">✏️</button>
+      <button class="sug-add" onclick="event.stopPropagation();addFromCatalog('${encodeURIComponent(name)}')">+ Liste</button>
+    </div>`;
   }).join("");
   box.style.display="block";
 }
@@ -736,8 +801,8 @@ function hideSug() { document.getElementById("suggestions").style.display="none"
 
 function addFromCatalog(enc) {
   const name=decodeURIComponent(enc);
-  const qty=parseInt(document.getElementById("modalQty").value)||1;
-    list.push({id:Date.now(),name,done:false,qty});
+  const unit=catalog[name]?.unit||"";
+  list.push({id:Date.now(),name,done:false,qty:1,unit});
   saveList(); renderList(); hideSug();
   document.getElementById("searchInp").value="";
   showToast("✓ "+name+" hinzugefügt");
@@ -746,7 +811,12 @@ function addFromCatalog(enc) {
 // ── REZEPTE ──
 let customRecipes = JSON.parse(localStorage.getItem("ek_custom_recipes") || "[]");
 function saveCustomRecipes() { localStorage.setItem("ek_custom_recipes", JSON.stringify(customRecipes)); }
-function allRecipes() { return [...RECIPES, ...customRecipes]; }
+function allRecipes() {
+  // Custom-Rezepte haben Vorrang über BASE-Rezepte (Overrides)
+  const customNames = new Set(customRecipes.map(r => r.overrides || r.name));
+  const baseFiltered = RECIPES.filter(r => !customNames.has(r.name));
+  return [...baseFiltered, ...customRecipes];
+}
 
 let editingRecipeName = null;
 
@@ -763,12 +833,14 @@ function openNewRecipeModal() {
 
 function editRecipe(enc) {
   const name = decodeURIComponent(enc);
-  const r = customRecipes.find(r=>r.name===name);
+  // Suche in custom zuerst, dann in RECIPES
+  const r = customRecipes.find(r=>r.name===name) || RECIPES.find(r=>r.name===name);
   if(!r) return;
   editingRecipeName = name;
   document.getElementById("recipeModalTitle").textContent = "Rezept bearbeiten";
   document.getElementById("recipeModalOk").textContent = "Aktualisieren";
   document.getElementById("recipeModalName").value = r.name;
+  document.getElementById("recipeModalName").disabled = false;
   document.getElementById("recipeModalTags").value = r.tags || "";
   document.getElementById("recipeModalZutaten").value = r.zutaten.join(", ");
   document.getElementById("recipeModalOverlay").style.display = "flex";
@@ -783,8 +855,14 @@ function saveNewRecipe() {
   const zutaten = zutatenRaw ? zutatenRaw.split(",").map(z=>z.trim()).filter(Boolean) : [];
 
   if(editingRecipeName) {
-    const idx = customRecipes.findIndex(r=>r.name===editingRecipeName);
-    if(idx>=0) customRecipes[idx] = {name, tags, zutaten, custom: true};
+    // Bearbeitung — in customRecipes speichern (überschreibt BASE falls nötig)
+    const customIdx = customRecipes.findIndex(r=>r.name===editingRecipeName);
+    if(customIdx >= 0) {
+      customRecipes[customIdx] = {name, tags, zutaten, custom: true};
+    } else {
+      // War ein BASE-Rezept — als Custom-Override speichern
+      customRecipes.push({name, tags, zutaten, custom: true, overrides: editingRecipeName});
+    }
   } else {
     if(allRecipes().find(r=>r.name===name)) { showToast("Rezept existiert bereits!"); return; }
     customRecipes.push({name, tags, zutaten, custom: true});
@@ -793,6 +871,7 @@ function saveNewRecipe() {
   closeRecipeModalDirect();
   renderRecipes();
   showToast(editingRecipeName ? "✓ Rezept aktualisiert" : "✓ "+name+" gespeichert");
+  editingRecipeName = null;
 }
 
 function deleteRecipe(enc) {
@@ -828,10 +907,10 @@ function renderRecipes() {
         </div>
         <button class="recipe-add-btn" onclick="addRecipeToList('${encodeURIComponent(r.name)}')">+ Einkauf</button>
       </div>
-      ${r.custom ? `<div style="margin-top:8px;display:flex;gap:6px">
+      <div style="margin-top:8px;display:flex;gap:6px;">
         <button onclick="editRecipe('${encodeURIComponent(r.name)}')" style="background:none;border:1px solid var(--line);border-radius:6px;padding:4px 10px;font-size:0.72rem;color:var(--pale);cursor:pointer;">✏️ Bearbeiten</button>
-        <button onclick="deleteRecipe('${encodeURIComponent(r.name)}')" style="background:none;border:1px solid var(--line);border-radius:6px;padding:4px 10px;font-size:0.72rem;color:var(--pale);cursor:pointer;">🗑 Löschen</button>
-      </div>` : ""}
+        ${r.custom ? `<button onclick="deleteRecipe('${encodeURIComponent(r.name)}')" style="background:none;border:1px solid var(--line);border-radius:6px;padding:4px 10px;font-size:0.72rem;color:var(--pale);cursor:pointer;">🗑 Löschen</button>` : ''}
+      </div>
     </div>`;
   }).join("");
 }
@@ -855,14 +934,22 @@ function addRecipeToList(enc) {
 
 // ── MODAL ──
 function openAddModal(prefill) {
+  if(prefill) prefill = decodeURIComponent(prefill);
   modalMode="new";
-  document.getElementById("modalTitle").textContent="Neuer Artikel";
-  document.getElementById("modalSub").textContent="Preis wird gespeichert";
-  document.getElementById("modalOk").textContent="Hinzufügen";
+  document.getElementById("modalTitle").textContent = prefill ? "Artikel bearbeiten" : "Neuer Artikel";
+  document.getElementById("modalSub").textContent="Preis wird dauerhaft gespeichert";
+  document.getElementById("modalOk").textContent= prefill ? "Speichern" : "Hinzufügen";
   document.getElementById("modalName").value=prefill||"";
-  document.getElementById("modalName").disabled=false;
+  document.getElementById("modalName").disabled=!!prefill;
   const ep=prefill?getPrice(prefill):0;
+  const es=prefill?(catalog[prefill]?.shop||""):"";
+  const ec=prefill?(catalog[prefill]?.cat||"Sonstiges"):"Sonstiges";
+  const eu=prefill?(catalog[prefill]?.unit||""):"";
   document.getElementById("modalPrice").value=ep>0?ep:"";
+  document.getElementById("modalQty").value=1;
+  document.getElementById("modalShop").value=es;
+  document.getElementById("modalCat").value=ec;
+  document.getElementById("modalUnit").value=eu;
   document.getElementById("modalOverlay").style.display="flex";
   setTimeout(()=>document.getElementById(prefill?"modalPrice":"modalName").focus(),120);
 }
@@ -870,16 +957,18 @@ function openPriceModal(id) {
   const item=list.find(i=>i.id===id); if(!item) return;
   modalMode="edit-price"; editItemId=id;
   const p=getPrice(item.name), s=getShop(item.name);
+  const c=catalog[item.name]?.cat||"Sonstiges";
+  const u=catalog[item.name]?.unit||"";
   document.getElementById("modalTitle").textContent=item.name;
-  const subParts = [];
-  if(s) subParts.push("Zuletzt bei "+s);
-  if(p>0) subParts.push(fmt(p)+" / Stück");
-  document.getElementById("modalSub").textContent=subParts.length?subParts.join(" · "):"Preis & Anzahl anpassen";
+  document.getElementById("modalSub").textContent=s?"Zuletzt bei "+s:"Preis & Details anpassen";
   document.getElementById("modalOk").textContent="Speichern";
   document.getElementById("modalName").value=item.name;
   document.getElementById("modalName").disabled=true;
   document.getElementById("modalPrice").value=p>0?p:"";
   document.getElementById("modalQty").value=item.qty||1;
+  document.getElementById("modalShop").value=s||"";
+  document.getElementById("modalCat").value=c;
+  document.getElementById("modalUnit").value=u;
   document.getElementById("modalOverlay").style.display="flex";
   setTimeout(()=>document.getElementById("modalPrice").focus(),120);
 }
@@ -891,15 +980,28 @@ function modalOk() {
     if(!name) { document.getElementById("modalName").focus(); return; }
     const price=parseFloat(document.getElementById("modalPrice").value)||0;
     const qty=parseInt(document.getElementById("modalQty").value)||1;
-    if(price>0||!catalog[name]) { catalog[name]={price,shop:catalog[name]?.shop||"",cat:catalog[name]?.cat||""}; saveCatalog(); }
-    list.push({id:Date.now(),name,done:false,qty});
+    const shop=document.getElementById("modalShop").value||catalog[name]?.shop||"";
+    const cat=document.getElementById("modalCat").value||catalog[name]?.cat||"Sonstiges";
+    const unit=document.getElementById("modalUnit").value||catalog[name]?.unit||"";
+    catalog[name]={price:price||catalog[name]?.price||0, shop, cat, unit};
+    saveCatalog();
+    list.push({id:Date.now(),name,done:false,qty,unit});
     saveList(); renderList(); closeModalDirect();
     showToast("✓ "+name+" hinzugefügt");
     document.getElementById("searchInp").value="";
   } else {
     const price=parseFloat(document.getElementById("modalPrice").value)||0;
     const item=list.find(i=>i.id===editItemId);
-    if(item) { catalog[item.name]={price,shop:catalog[item.name]?.shop||"",cat:catalog[item.name]?.cat||""}; item.qty=parseInt(document.getElementById("modalQty").value)||1; saveCatalog(); saveList(); renderList(); showToast("Gespeichert ✓"); }
+    if(item) {
+      const shop=document.getElementById("modalShop").value||catalog[item.name]?.shop||"";
+      const cat=document.getElementById("modalCat").value||catalog[item.name]?.cat||"Sonstiges";
+      const unit=document.getElementById("modalUnit").value||catalog[item.name]?.unit||"";
+      catalog[item.name]={price,shop,cat,unit};
+      item.qty=parseInt(document.getElementById("modalQty").value)||1;
+      item.unit=unit;
+      saveCatalog(); saveList(); renderList();
+      showToast("Gespeichert ✓");
+    }
     closeModalDirect();
   }
 }
@@ -919,7 +1021,7 @@ function renderList() {
   updateBudgetDisplay();
   const c=document.getElementById("scrollList");
   if(!list.length) {
-    c.innerHTML=`<div class="empty"><div class="empty-icon">🛒</div><p>Suche nach Artikeln<br>oder wähle ein <strong>Rezept</strong><br>um Zutaten direkt hinzuzufügen!</p></div>`; return;
+    c.innerHTML=`<div class="empty"><div class="empty-icon">🛒</div><p>Suche nach Artikeln<br>oder wähle ein <strong style="color:var(--mint);">Rezept</strong><br>um <span style="color:var(--mint);font-weight:600;">Zutaten</span> direkt hinzuzufügen!</p></div>`; return;
   }
   const open=list.filter(i=>!i.done), done2=list.filter(i=>i.done);
   let html="";
