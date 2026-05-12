@@ -227,6 +227,9 @@ header{background:var(--dark);padding:calc(var(--safe-top) + 16px) 20px 14px;fle
 .btn-ok{flex:2;padding:12px;border-radius:10px;border:none;background:var(--dark);color:white;font-family:"DM Sans",sans-serif;font-size:0.88rem;font-weight:600;cursor:pointer;}
 .btn-ok:active{background:var(--bx);}
 
+/* KÜHLSCHRANK CHIPS */
+#fridgeChips { padding: 8px 12px; display: flex; flex-wrap: wrap; gap: 4px; min-height: 44px; align-items: center; }
+
 /* TOAST */
 .toast{position:fixed;bottom:calc(76px + var(--safe-bottom));left:50%;transform:translateX(-50%) translateY(10px);background:var(--dark);color:white;padding:9px 18px;border-radius:20px;font-size:0.8rem;font-weight:500;opacity:0;transition:all 0.25s;pointer-events:none;white-space:nowrap;z-index:300;}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
@@ -291,6 +294,15 @@ self.addEventListener('fetch', e => {
   <symbol id="ico-shop" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
     <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/>
   </symbol>
+  <symbol id="ico-fridge" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="4" y="2" width="16" height="20" rx="2"/><line x1="4" y1="10" x2="20" y2="10"/><line x1="8" y1="6" x2="8" y2="8"/><line x1="8" y1="14" x2="8" y2="18"/>
+  </symbol>
+  <symbol id="ico-chart" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/><line x1="2" y1="20" x2="22" y2="20"/>
+  </symbol>
+  <symbol id="ico-lists" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/>
+  </symbol>
   <symbol id="ico-pot" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
     <path d="M3 11l19-9-9 19-2-8-8-2z"/>
   </symbol>
@@ -299,10 +311,21 @@ self.addEventListener('fetch', e => {
 
 <header>
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
-    <div class="header-title">Inimei's <span>Kitchen</span></div>
-    <button class="scan-btn" onclick="shareApp()" title="App teilen" style="background:rgba(255,255,255,0.1);border:1.5px solid rgba(255,255,255,0.2);">
-      <svg width="18" height="18" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
-    </button>
+    <div>
+      <div class="header-title">Inimei's <span>Kitchen</span></div>
+      <div id="currentListLabel" style="font-size:0.68rem;color:rgba(255,255,255,0.5);margin-top:1px;">🛒 Hauptliste</div>
+    </div>
+    <div style="display:flex;gap:6px;">
+      <button class="scan-btn" onclick="openLists()" title="Meine Listen" style="background:rgba(255,255,255,0.1);border:1.5px solid rgba(255,255,255,0.2);">
+        <svg width="18" height="18" fill="none" stroke="white" stroke-width="2" viewBox="0 0 24 24"><use href="#ico-lists"/></svg>
+      </button>
+      <button class="scan-btn" onclick="openStats()" title="Ausgaben" style="background:rgba(255,255,255,0.1);border:1.5px solid rgba(255,255,255,0.2);">
+        <svg width="18" height="18" fill="none" stroke="white" stroke-width="2" viewBox="0 0 24 24"><use href="#ico-chart"/></svg>
+      </button>
+      <button class="scan-btn" onclick="shareApp()" title="App teilen" style="background:rgba(255,255,255,0.1);border:1.5px solid rgba(255,255,255,0.2);">
+        <svg width="18" height="18" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+      </button>
+    </div>
   </div>
   <div class="totals">
     <div class="total-box"><div class="total-box-label">Liste gesamt</div><div class="total-box-val" id="valTotal">0,00 €</div></div>
@@ -323,6 +346,7 @@ self.addEventListener('fetch', e => {
   <div class="tab" id="tab-rezepte" onclick="switchTab('rezepte')"><svg width="18" height="18" class=""><use href="#ico-book"/></svg> <span>Rezepte</span></div>
   <div class="tab" id="tab-woche" onclick="switchTab('woche')"><svg width="18" height="18" class=""><use href="#ico-calendar"/></svg> <span>Woche</span></div>
   <div class="tab" id="tab-markt" onclick="switchTab('markt')"><svg width="18" height="18" class=""><use href="#ico-shop"/></svg> <span>Markt</span></div>
+  <div class="tab" id="tab-fridge" onclick="switchTab('fridge')"><svg width="18" height="18" class=""><use href="#ico-fridge"/></svg> <span>Kühlschrank</span></div>
 </div>
 
 <!-- LISTE TAB -->
@@ -377,6 +401,23 @@ self.addEventListener('fetch', e => {
     <button class="markt-filter-btn" id="filter-Sonstige" onclick="setMarktFilter('Sonstige')">Sonstige</button>
   </div>
   <div class="scroll-area" id="scrollMarkt"></div>
+</div>
+
+<!-- KÜHLSCHRANK TAB -->
+<div id="view-fridge" style="display:none;flex-direction:column;flex:1;overflow:hidden;">
+  <div class="search-bar">
+    <input class="search-inp" id="fridgeInp" placeholder="Was hast du noch? z.B. Lachs, Kartoffeln…" autocomplete="off" autocorrect="off" oninput="renderFridge()"/>
+    <button class="btn-neu" onclick="addFridgeItem()">+ Hinzu</button>
+  </div>
+  <div style="padding:8px 12px;background:var(--white);border-bottom:1px solid var(--line);flex-shrink:0;" id="fridgeChips">
+    <!-- Chips der vorhandenen Zutaten -->
+  </div>
+  <div class="scroll-area" id="scrollFridge">
+    <div class="empty">
+      <div class="empty-icon">🥦</div>
+      <p>Tipp ein was du noch im Kühlschrank hast<br>und ich zeige dir <strong style="color:var(--mint);">was du kochen kannst!</strong></p>
+    </div>
+  </div>
 </div>
 
 <!-- WOCHENPLAN TAB -->
@@ -466,6 +507,34 @@ self.addEventListener('fetch', e => {
   </div>
 </div>
 
+<!-- LISTEN OVERLAY -->
+<div class="modal-overlay" id="listsOverlay" onclick="closeListsOverlay(event)" style="align-items:flex-end;">
+  <div style="background:var(--white);width:100%;border-radius:20px 20px 0 0;max-height:80vh;display:flex;flex-direction:column;overflow:hidden;">
+    <div style="padding:16px 18px 12px;display:flex;align-items:center;border-bottom:1px solid var(--line);flex-shrink:0;">
+      <div style="font-family:'Playfair Display',serif;font-size:1rem;flex:1;">Meine Listen</div>
+      <button onclick="closeListsOverlay()" style="background:none;border:none;font-size:1.3rem;color:var(--pale);cursor:pointer;">✕</button>
+    </div>
+    <div style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;" id="listsContainer"></div>
+    <div style="padding:12px 16px calc(12px + var(--safe-bottom));border-top:1px solid var(--line);">
+      <div style="display:flex;gap:8px;">
+        <input style="flex:1;padding:10px 14px;border:1.5px solid var(--line);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:0.9rem;outline:none;" id="newListName" placeholder="Name der neuen Liste…" autocorrect="off"/>
+        <button onclick="createNewList()" style="padding:10px 16px;background:var(--dark);color:white;border:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:0.88rem;font-weight:600;cursor:pointer;">+ Neu</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- STATS OVERLAY -->
+<div class="modal-overlay" id="statsOverlay" onclick="closeStatsOverlay(event)" style="align-items:flex-end;">
+  <div style="background:var(--white);width:100%;border-radius:20px 20px 0 0;max-height:90vh;display:flex;flex-direction:column;overflow:hidden;">
+    <div style="padding:16px 18px 12px;display:flex;align-items:center;border-bottom:1px solid var(--line);flex-shrink:0;">
+      <div style="font-family:'Playfair Display',serif;font-size:1rem;flex:1;">📊 Ausgaben-Tracker</div>
+      <button onclick="closeStatsOverlay()" style="background:none;border:none;font-size:1.3rem;color:var(--pale);cursor:pointer;">✕</button>
+    </div>
+    <div style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:16px;" id="statsContainer"></div>
+  </div>
+</div>
+
 <!-- SCANNER INFO MODAL -->
 <div class="modal-overlay" id="scannerInfoOverlay" onclick="closeScannerInfo()">
   <div class="modal" style="text-align:center;">
@@ -519,7 +588,7 @@ self.addEventListener('fetch', e => {
 
 <script>
 const RECIPES = [{"name": "Hühner-Nudel-Suppe", "tags": "Wochenende", "zutaten": ["Hähnchenschenkel", "Hühnerbrühe", "Möhren", "Sellerie"]}, {"name": "Steak und Eier", "tags": "Belohnung", "zutaten": ["Steak", "Eier"]}, {"name": "Gemischter Salat", "tags": "Gesund", "zutaten": ["Speck", "Tomaten", "Salat", "Salatdressing", "Eier", "Avocado", "Hähnchenschenkel"]}, {"name": "Gebackenes Hähnchen mit Kartoffeln", "tags": "Schwer", "zutaten": ["Hähnchenschenkel", "Kartoffeln"]}, {"name": "Grillkäse", "tags": "Belohnung", "zutaten": ["Sauerteig", "Cheddarkäse"]}, {"name": "Lachs mit Spargel", "tags": "Gesund, Protein", "zutaten": ["Lachsfilets", "Spargel", "Eier"]}, {"name": "Brokkoli-Kartoffelsuppe mit Cheddar", "tags": "", "zutaten": ["Brokkoli", "Kartoffeln", "Cheddar gerieben"]}, {"name": "Nudeln mit Champignonrahm", "tags": "", "zutaten": ["Pasta", "Champignons", "H-Sahne"]}, {"name": "Mac & Cheese", "tags": "", "zutaten": ["Pasta", "Cheddar gerieben", "Milch 3,5 %"]}, {"name": "Nudeln mit Tomatensauce", "tags": "", "zutaten": ["Pasta", "Tomaten", "Zwiebeln"]}, {"name": "Hühnersuppe", "tags": "", "zutaten": ["Hähnchenschenkel", "Möhren", "Sellerie", "Zwiebeln"]}, {"name": "Gemüsesuppe", "tags": "", "zutaten": ["Möhren", "Kartoffeln", "Sellerie", "Zwiebeln"]}, {"name": "Lachs mit Kartoffelbrei und Gurkensalat", "tags": "", "zutaten": ["Lachsfilets", "Kartoffeln", "Gurke"]}, {"name": "Putensteaks in Rahmsauce mit Reis und Feldsalat", "tags": "", "zutaten": ["Putenschnitzel", "H-Sahne", "Feldsalat"]}, {"name": "Forelle mit Feldsalat und Sauce Hollandaise", "tags": "", "zutaten": ["Geräuchertes Forellenfilet", "Feldsalat", "Eier"]}, {"name": "Pizza", "tags": "", "zutaten": ["Wraps Mehrkorn", "Tomaten", "Cheddar gerieben"]}, {"name": "Flammkuchen", "tags": "", "zutaten": ["Wraps Mehrkorn", "H-Sahne", "Speck", "Zwiebeln"]}, {"name": "Backfisch mit Pommes und Gurkensalat", "tags": "", "zutaten": ["Lachsfilet", "Tiefkühlpommes", "Gurke"]}, {"name": "Hamburger mit Pommes und Coleslaw", "tags": "", "zutaten": ["Rinder Burger", "Hamburger Brötchen", "Tiefkühlpommes", "Eisbergsalat"]}, {"name": "Gulasch mit Nudeln", "tags": "", "zutaten": ["Rindergulasch", "Zwiebeln", "Spitzpaprika", "Tomaten", "Pasta"]}, {"name": "Putenmedaillons in Rahmsauce mit Pilav", "tags": "", "zutaten": ["Putenschnitzel", "H-Sahne", "Feldsalat"]}, {"name": "Putenschnitzel mit Pommes", "tags": "", "zutaten": ["Putenschnitzel", "Tiefkühlpommes"]}, {"name": "Würstchen mit Kartoffelbrei und Spargelsalat", "tags": "", "zutaten": ["Wiener Würstchen", "Kartoffeln", "Spargel weiß"]}, {"name": "Cevapcici mit Fladenbrot", "tags": "", "zutaten": ["Rinder Burger", "Wraps Mehrkorn", "Joghurt"]}, {"name": "Pfannenpizza", "tags": "", "zutaten": ["Wraps Mehrkorn", "Tomaten", "Cheddar gerieben", "Salami"]}, {"name": "Wienerle mit Kartoffelbrei und Salat", "tags": "", "zutaten": ["Wiener Würstchen", "Kartoffeln", "Feldsalat"]}, {"name": "Bratwürstchen mit Bratkartoffeln", "tags": "", "zutaten": ["Bratwurst", "Kartoffeln"]}, {"name": "Milchreis", "tags": "", "zutaten": ["Milch 3,5 %", "Pirinc Reis"]}, {"name": "Pfannkuchen", "tags": "", "zutaten": ["Eier", "Milch 3,5 %", "Weizenmehl"]}, {"name": "Griesbrei", "tags": "", "zutaten": ["Milch 3,5 %"]}, {"name": "Fischstäbchen mit Pommes", "tags": "Freitag", "zutaten": ["Tiefkühlpommes"]}, {"name": "Nudelsalat mit Thunfisch und Avocado", "tags": "Samstag", "zutaten": ["Pasta", "Avocado", "Mayonaise"]}, {"name": "Nudeln mit Knoblauchjoghurt", "tags": "", "zutaten": ["Pasta", "Joghurt", "Knoblauch"]}, {"name": "Caesar Salat", "tags": "", "zutaten": ["Eisbergsalat", "Eier", "Parmesan"]}, {"name": "Butterhirse mit Hähnchen und Salat", "tags": "", "zutaten": ["Hähnchenschenkel", "Feldsalat"]}, {"name": "Fleischeintopf mit Pilav", "tags": "", "zutaten": ["Joghurt", "Rindergulasch", "Zwiebeln", "Suppengemüse"]}, {"name": "Lachs mit Rote Beete Salat und Kartoffeln", "tags": "", "zutaten": ["Lachsfilet", "Kartoffeln"]}, {"name": "Taze Fasulye mit Reis", "tags": "", "zutaten": ["Breite Bohnen", "Pirinc Reis", "Tomaten"]}, {"name": "Karottensalat", "tags": "", "zutaten": ["Bio Karotten", "Zitronen"]}, {"name": "Kartoffelsalat", "tags": "", "zutaten": ["Kartoffeln", "Mayonaise", "Petersilie"]}, {"name": "Tomatensuppe", "tags": "", "zutaten": ["Tomaten", "Zwiebeln", "H-Sahne"]}, {"name": "Kürbissuppe", "tags": "", "zutaten": ["Zwiebeln", "H-Sahne"]}, {"name": "Lachssuppe", "tags": "", "zutaten": ["Lachsfilet", "Kartoffeln", "H-Sahne", "Möhren"]}];
-const BASE_CATALOG = {"Eisbergsalat": {"price": 1.11, "shop": "Lidl", "cat": "Gemüse"}, "Feldsalat": {"price": 1.0, "shop": "Penny", "cat": "Gemüse"}, "Stilles Wasser": {"price": 0.25, "shop": "Lidl", "cat": "Getränke"}, "Mineralwasser": {"price": 0.75, "shop": "Lidl", "cat": "Getränke"}, "Erdbeeren": {"price": 1.99, "shop": "Penny", "cat": "Obst"}, "Zitronen": {"price": 1.39, "shop": "Lidl", "cat": "Obst"}, "Freilandeier XXL": {"price": 3.99, "shop": "Lidl", "cat": "Fleisch&Fisch"}, "Nuss-Nougat-Creme": {"price": 1.99, "shop": "Lidl", "cat": "Süßigkeiten"}, "Pasta": {"price": 2.59, "shop": "Aldi", "cat": "Trockenwaren"}, "Linsenwaffeln": {"price": 1.35, "shop": "Aldi", "cat": "Trockenwaren"}, "Gurken": {"price": 1.49, "shop": "Lidl", "cat": "Gemüse"}, "Soft Panini": {"price": 1.59, "shop": "Aldi", "cat": "Backwaren"}, "Ziegenfrischkäse": {"price": 1.99, "shop": "Aldi", "cat": "Milchprodukte"}, "Heidelbeeren": {"price": 1.59, "shop": "Aldi", "cat": "Obst"}, "Petersilie": {"price": 1.59, "shop": "Lidl", "cat": "Gemüse"}, "Avocado": {"price": 0.89, "shop": "Aldi", "cat": "Gemüse"}, "Joghurt": {"price": 1.15, "shop": "Aldi", "cat": "Milchprodukte"}, "Mandeln": {"price": 2.29, "shop": "Aldi", "cat": "Trockenwaren"}, "Rindergulasch": {"price": 6.39, "shop": "Aldi", "cat": "Fleisch&Fisch"}, "Spitzpaprika": {"price": 1.89, "shop": "Aldi", "cat": "Gemüse"}, "Wraps": {"price": 1.29, "shop": "Aldi", "cat": "Backwaren"}, "Spätzle": {"price": 2.69, "shop": "Aldi", "cat": "Trockenwaren"}, "Spargel weiß": {"price": 2.44, "shop": "Aldi", "cat": "Gemüse"}, "Hundefutter nass": {"price": 0.75, "shop": "Aldi", "cat": "Hundefutter"}, "Irischer Cheddarkäse": {"price": 2.49, "shop": "Aldi", "cat": "Milchprodukte"}, "Lauchzwiebeln": {"price": 0.49, "shop": "Aldi", "cat": "Gemüse"}, "Gurke": {"price": 0.69, "shop": "Penny", "cat": "Gemüse"}, "Frühkartoffeln": {"price": 2.29, "shop": "Aldi", "cat": "Gemüse"}, "Nektarinen": {"price": 1.79, "shop": "Aldi", "cat": "Obst"}, "Wiener Würstchen": {"price": 5.78, "shop": "Aldi", "cat": "Fleisch&Fisch"}, "Bio Karotten": {"price": 0.99, "shop": "Aldi", "cat": "Gemüse"}, "Bio Honig": {"price": 3.75, "shop": "Aldi", "cat": "Süßigkeiten"}, "Wraps Mehrkorn": {"price": 1.59, "shop": "Aldi", "cat": "Backwaren"}, "Das Rustikale Dinkelbrot": {"price": 1.89, "shop": "Aldi", "cat": "Backwaren"}, "Champignons": {"price": 1.39, "show": "Aldi", "cat": "Gemüse"}, "Bio Reiswaffeln": {"price": 0.65, "shop": "Aldi", "cat": "Trockenwaren"}, "Österreichischer Bergkäse": {"price": 3.99, "shop": "Aldi", "cat": "Milchprodukte"}, "Gouda gerieben": {"price": 2.39, "shop": "Aldi", "cat": "Milchprodukte"}, "Weihenstephan Butter": {"price": 2.29, "shop": "Aldi", "cat": "Milchprodukte"}, "Tomaten": {"price": 1.18, "shop": "Rewe", "cat": "Gemüse"}, "Geflügel Fleischwurst": {"price": 2.79, "shop": "Aldi", "cat": "Fleisch&Fisch"}, "Sonntagsbrötchen": {"price": 1.19, "shop": "Aldi", "cat": "Backwaren"}, "Kartoffeln": {"price": 3.49, "shop": "Aldi", "cat": "Gemüse"}, "Tiefkühlpommes": {"price": 1.79, "shop": "Aldi", "cat": "Gemüse"}, "Lachsfilet": {"price": 9.99, "shop": "Aldi", "cat": "Fleisch&Fisch"}, "Cocktailtomaten": {"price": 1.29, "shop": "Aldi", "cat": "Gemüse"}, "Putenschnitzel": {"price": 4.99, "shop": "Aldi", "cat": "Fleisch&Fisch"}, "Eier": {"price": 2.39, "shop": "Aldi", "cat": "Milchprodukte"}, "Apfelecke": {"price": 0.69, "shop": "Aldi", "cat": "Backwaren"}, "Rispentomaten": {"price": 1.79, "shop": "Penny", "cat": "Gemüse"}, "Buttercroissant": {"price": 0.49, "shop": "Aldi", "cat": "Backwaren"}, "Flabatta": {"price": 0.99, "shop": "Aldi", "cat": "Backwaren"}, "Bio Zucchini": {"price": 0.85, "shop": "Aldi", "cat": "Gemüse"}, "Auberginen": {"price": 0.59, "shop": "Aldi", "cat": "Gemüse"}, "Kohlrabi": {"price": 0.55, "shop": "Aldi", "cat": "Gemüse"}, "H-Sahne": {"price": 0.99, "shop": "Aldi", "cat": "Milchprodukte"}, "Frischkäse Ziege": {"price": 1.59, "shop": "Aldi", "cat": "Milchprodukte"}, "Franzbrötchen": {"price": 0.79, "shop": "Aldi", "cat": "Backwaren"}, "Rinder Burger": {"price": 2.99, "shop": "Aldi", "cat": "Fleisch&Fisch"}, "Hamburger Brötchen": {"price": 0.99, "shop": "Aldi", "cat": "Backwaren"}, "Bananen": {"price": 0.89, "shop": "Aldi", "cat": "Obst"}, "Mayonaise": {"price": 1.69, "shop": "Aldi", "cat": "Sonstiges"}, "Panini": {"price": 1.59, "shop": "Aldi", "cat": "Backwaren"}, "Bio-Joghurt": {"price": 1.99, "shop": "Aldi", "cat": "Milchprodukte"}, "Cheddar gerieben": {"price": 2.49, "shop": "Aldi", "cat": "Milchprodukte"}, "Salami": {"price": 1.99, "shop": "Aldi", "cat": "Fleisch&Fisch"}, "Bratwurst": {"price": 2.59, "shop": "Aldi", "cat": "Fleisch&Fisch"}, "Putengeschnetzeltes XXL": {"price": 5.99, "shop": "Aldi", "cat": "Fleisch&Fisch"}, "Paprika": {"price": 0.99, "shop": "Aldi", "cat": "Gemüse"}, "Bio Babyspinat": {"price": 1.09, "shop": "Aldi", "cat": "Gemüse"}, "Wellenschnittpommes": {"price": 1.79, "shop": "Aldi", "cat": "Gemüse"}, "Griechischer Joghurt": {"price": 2.19, "shop": "Lidl", "cat": "Milchprodukte"}, "Rinder Hamburger": {"price": 4.19, "shop": "Aldi", "cat": "Fleisch&Fisch"}, "Wassermelone": {"price": 1.15, "shop": "Aldi", "cat": "Obst"}, "Geräuchertes Forellenfilet": {"price": 2.49, "shop": "Lidl", "cat": "Fleisch&Fisch"}, "10 Freilandeier": {"price": 2.39, "shop": "Lidl", "cat": "Fleisch&Fisch"}, "Weizenbrötchen": {"price": 0.19, "shop": "Aldi", "cat": "Backwaren"}, "Küchentücher": {"price": 2.85, "shop": "DM", "cat": "Haushaltsartikel"}, "Weizenmehl": {"price": 0.85, "shop": "DM", "cat": "Trockenwaren"}, "Meersalz jodiert": {"price": 0.75, "shop": "DM", "cat": "Trockenwaren"}, "Dinkelmehl": {"price": 1.35, "shop": "DM", "cat": "Trockenwaren"}, "Milch 3,5 %": {"price": 1.15, "shop": "DM", "cat": "Milchprodukte"}, "Senf": {"price": 1.45, "shop": "DM", "cat": "Sonstiges"}, "Toilettenpapier": {"price": 4.89, "shop": "Rossmann", "cat": "Haushaltsartikel"}, "Spülmittel": {"price": 0.95, "shop": "DM", "cat": "Haushaltsartikel"}, "Bio Joghurt": {"price": 1.15, "shop": "Aldi", "cat": "Milchprodukte"}, "Brokkoli": {"price": 0.75, "shop": "Aldi", "cat": "Gemüse"}, "Breite Bohnen": {"price": 1.89, "shop": "Aldi", "cat": "Gemüse"}, "Bio Bergbauernkäse": {"price": 3.49, "shop": "Aldi", "cat": "Milchprodukte"}, "Hähnchen Flügel": {"price": 5.59, "shop": "Aldi", "cat": "Fleisch&Fisch"}, "Kerrygold Butter": {"price": 3.99, "shop": "Lidl", "cat": "Milchprodukte"}, "Suppengemüse": {"price": 1.69, "shop": "Aldi", "cat": "Gemüse"}, "Pirinc Reis": {"price": 9.99, "shop": "Bakal Dogan", "cat": "Trockenwaren"}, "Zwiebeln": {"price": 1.99, "shop": "Aldi", "cat": "Gemüse"}, "Bio Salami": {"price": 1.99, "shop": "Aldi", "cat": "Fleisch&Fisch"}, "Mini Gurken": {"price": 0.99, "shop": "Aldi", "cat": "Gemüse"}, "Spargel": {"price": 2.44, "shop": "Aldi", "cat": "Gemüse"}, "Möhren": {"price": 0.99, "shop": "Aldi", "cat": "Gemüse"}, "Sellerie": {"price": 0.99, "shop": "Aldi", "cat": "Gemüse"}, "Hähnchenschenkel": {"price": 3.99, "shop": "Aldi", "cat": "Fleisch&Fisch"}, "Lachsfilets": {"price": 9.99, "shop": "Aldi", "cat": "Fleisch&Fisch"}, "Knoblauch": {"price": 0.49, "shop": "Aldi", "cat": "Gemüse"}, "Speck": {"price": 1.99, "shop": "Aldi", "cat": "Fleisch&Fisch"}, "Steak": {"price": 8.99, "shop": "Aldi", "cat": "Fleisch&Fisch"}, "Salat": {"price": 0.99, "shop": "Aldi", "cat": "Gemüse"}, "Salatdressing": {"price": 1.49, "shop": "Aldi", "cat": "Sonstiges"}, "Cheddarkäse": {"price": 2.49, "shop": "Aldi", "cat": "Milchprodukte"}, "Sauerteig": {"price": 1.99, "shop": "Aldi", "cat": "Backwaren"}, "Hühnerbrühe": {"price": 0.99, "shop": "Aldi", "cat": "Sonstiges"}, "Bio Bananen": {"price": 0.27, "shop": "Penny", "cat": "Obst"}, "Mortadella": {"price": 1.99, "shop": "Penny", "cat": "Fleisch&Fisch"}, "Geflügelsalami": {"price": 1.99, "shop": "Penny", "cat": "Fleisch&Fisch"}, "Cheddar": {"price": 2.79, "shop": "Penny", "cat": "Milchprodukte"}, "Laugenbrezel": {"price": 0.39, "shop": "Penny", "cat": "Backwaren"}, "Laugenstange": {"price": 0.39, "shop": "Penny", "cat": "Backwaren"}, "Berliner": {"price": 0.45, "shop": "Penny", "cat": "Backwaren"}, "Bio Körner Sandwich": {"price": 1.79, "shop": "Penny", "cat": "Backwaren"}, "Bio Zitrone": {"price": 1.49, "shop": "Penny", "cat": "Obst"}, "Sprühsahne 30%": {"price": 2.19, "shop": "Penny", "cat": "Milchprodukte"}, "Nuss Nougat Eis": {"price": 3.49, "shop": "Penny", "cat": "Süßigkeiten"}, "Doritos BBQ": {"price": 1.11, "shop": "Penny", "cat": "Trockenwaren"}, "Cola": {"price": 0.99, "shop": "Penny", "cat": "Getränke"}, "Rind Hack 500g": {"price": 4.33, "shop": "Aldi", "cat": "Fleisch&Fisch"}, "Mandarinen": {"price": 1.79, "shop": "Aldi", "cat": "Obst"}, "Sahnejoghurt": {"price": 2.19, "shop": "Aldi", "cat": "Milchprodukte"}, "Apfel rot": {"price": 3.29, "shop": "Lidl", "cat": "Obst"}, "Rustikales Baguette": {"price": 0.65, "shop": "Aldi", "cat": "Backwaren"}, "Feldsalat 150g": {"price": 1.49, "shop": "Aldi", "cat": "Gemüse"}, "Nussmischung": {"price": 3.49, "shop": "Aldi", "cat": "Trockenwaren"}, "Paprika rot": {"price": 2.45, "shop": "Aldi", "cat": "Gemüse"}, "Toffifee": {"price": 3.79, "shop": "Aldi", "cat": "Süßigkeiten"}, "Riesling feinherb": {"price": 2.79, "shop": "Aldi", "cat": "Alkoholische Getränke"}, "San Benedetto 1,5l": {"price": 0.79, "shop": "Aldi", "cat": "Getränke"}, "Haferflocken kernig": {"price": 0.69, "shop": "Aldi", "cat": "Trockenwaren"}, "Haferflocken zart": {"price": 0.69, "shop": "Aldi", "cat": "Trockenwaren"}, "Caffe Crema": {"price": 12.99, "shop": "Aldi", "cat": "Getränke"}, "Nuss-Nougat-Croissant": {"price": 0.69, "shop": "Aldi", "cat": "Backwaren"}, "Mineralwasser 500ml": {"price": 0.34, "shop": "Aldi", "cat": "Getränke"}, "Laugen Brioche": {"price": 1.99, "shop": "Aldi", "cat": "Backwaren"}, "Geflügel-Frischwurst": {"price": 1.29, "shop": "Aldi", "cat": "Fleisch&Fisch"}, "Dauerwurst-Aufschnitt": {"price": 1.69, "shop": "Aldi", "cat": "Fleisch&Fisch"}, "Rettertüte": {"price": 3.0, "shop": "Lidl", "cat": "Sonstiges"}, "Bio Zitronen": {"price": 1.49, "shop": "Lidl", "cat": "Obst"}, "Geflügel Mortadella": {"price": 0.89, "shop": "Lidl", "cat": "Fleisch&Fisch"}, "Butter": {"price": 1.19, "shop": "Lidl", "cat": "Milchprodukte"}, "Forellenfilets": {"price": 2.49, "shop": "Lidl", "cat": "Fleisch&Fisch"}, "Ziegenfrischkäse Natur": {"price": 1.99, "shop": "Lidl", "cat": "Milchprodukte"}, "Olivenöl": {"price": 5.99, "shop": "Lidl", "cat": "Sonstiges"}, "Eier Freiland XXL": {"price": 1.69, "shop": "Lidl", "cat": "Milchprodukte"}, "Remoulade": {"price": 0.75, "shop": "Lidl", "cat": "Sonstiges"}, "Brunchmix Brötchen": {"price": 1.49, "shop": "Lidl", "cat": "Backwaren"}, "Snack-Mandeln": {"price": 3.49, "shop": "Lidl", "cat": "Trockenwaren"}, "Hähnchen-Geschnetzeltes": {"price": 3.99, "shop": "Lidl", "cat": "Fleisch&Fisch"}, "Abtei Magnesium": {"price": 2.59, "shop": "Lidl", "cat": "Sonstiges"}, "dmBio Milch 3,5% 1L": {"price": 1.25, "shop": "DM", "cat": "Milchprodukte"}, "dmBio Schoko Reiswaffeln": {"price": 1.45, "shop": "DM", "cat": "Süßigkeiten"}, "dmBio Nuss-Nougat Creme": {"price": 2.95, "shop": "DM", "cat": "Süßigkeiten"}, "dmBio Pistaziencreme": {"price": 4.95, "shop": "DM", "cat": "Süßigkeiten"}, "dmBio Spirelli 500g": {"price": 0.85, "shop": "DM", "cat": "Trockenwaren"}, "dmBio Spaghetti 500g": {"price": 0.85, "shop": "DM", "cat": "Trockenwaren"}, "dmBio Penne 500g": {"price": 0.85, "shop": "DM", "cat": "Trockenwaren"}, "dmBio Tagliatelle 500g": {"price": 1.45, "shop": "DM", "cat": "Trockenwaren"}, "dmBio Weizenmehl Type": {"price": 0.85, "shop": "DM", "cat": "Trockenwaren"}, "dmBio Rohrohrzucker 1000g": {"price": 1.95, "shop": "DM", "cat": "Trockenwaren"}, "dmBio Cornflakes ungesüßt": {"price": 1.25, "shop": "DM", "cat": "Trockenwaren"}, "dmBio Passata 690g": {"price": 1.05, "shop": "DM", "cat": "Trockenwaren"}, "dmBio Haferflocken Feinblatt": {"price": 2.85, "shop": "DM", "cat": "Trockenwaren"}, "dmBio Haferflocken": {"price": 1.49, "shop": "DM", "cat": "Trockenwaren"}, "dmBio Kastanien Dinkelk.": {"price": 1.95, "shop": "DM", "cat": "Trockenwaren"}, "dmBio Nuss n Choc": {"price": 0.95, "shop": "DM", "cat": "Süßigkeiten"}, "dmBio Gelierzucker 500g": {"price": 2.45, "shop": "DM", "cat": "Trockenwaren"}, "dmBio Apfelessig 750ml": {"price": 1.55, "shop": "DM", "cat": "Sonstiges"}, "dmBio Passata 4x": {"price": 1.05, "shop": "DM", "cat": "Trockenwaren"}, "dmBio Mandel Drink 1l": {"price": 1.35, "shop": "DM", "cat": "Milchprodukte"}, "dmBio Birne-Erdb.Apfel": {"price": 0.75, "shop": "DM", "cat": "Getränke"}, "dmBio Haferdrink Zucke": {"price": 0.9, "shop": "DM", "cat": "Getränke"}, "dmBio Gemüsebrüh. h.Nac": {"price": 2.45, "shop": "DM", "cat": "Sonstiges"}, "FF Quetschie Apf.Erd.Blau": {"price": 0.95, "shop": "DM", "cat": "Süßigkeiten"}, "Dein Bestes Hundefutter Huhn": {"price": 0.75, "shop": "DM", "cat": "Hundefutter"}, "Dein Bestes Bio Hundefutter": {"price": 0.65, "shop": "DM", "cat": "Hundefutter"}, "dmBio mini Elisen Lebkuchen": {"price": 2.1, "shop": "DM", "cat": "Süßigkeiten"}, "Goldbesteckmuster Artd 400g": {"price": 1.15, "shop": "DM", "cat": "Sonstiges"}, "Saphir Meersalz 500g": {"price": 0.75, "shop": "DM", "cat": "Haushaltsartikel"}, "Saphir Meersalz mit Jod": {"price": 0.75, "shop": "DM", "cat": "Haushaltsartikel"}, "Saphir Kochsalz": {"price": 0.75, "shop": "DM", "cat": "Haushaltsartikel"}, "Ivorell Mineralwasser Still": {"price": 0.45, "shop": "DM", "cat": "Getränke"}, "Denkmit Spülmittel Lavendel": {"price": 0.95, "shop": "DM", "cat": "Haushaltsartikel"}, "Denkmit Hygienespüler": {"price": 1.25, "shop": "DM", "cat": "Haushaltsartikel"}, "Denkmit Oxi Energy": {"price": 2.25, "shop": "DM", "cat": "Waschmittel"}, "Denkmit Anti-Kalk-Gel": {"price": 2.45, "shop": "DM", "cat": "Haushaltsartikel"}, "Denkmit MGR Tabs XL": {"price": 4.49, "shop": "DM", "cat": "Haushaltsartikel"}, "Denkmit Klarspüler": {"price": 0.99, "shop": "DM", "cat": "Haushaltsartikel"}, "Denkmit Spezial-Salz": {"price": 0.8, "shop": "DM", "cat": "Haushaltsartikel"}, "Denkmit Oxi Power Weiss": {"price": 2.25, "shop": "DM", "cat": "Waschmittel"}, "Denkmit Fleckensalz": {"price": 1.15, "shop": "DM", "cat": "Waschmittel"}, "Denkmit Wollwaschmittel": {"price": 2.15, "shop": "DM", "cat": "Waschmittel"}, "Frosch Bio-Spiritus Reiniger": {"price": 2.25, "shop": "DM", "cat": "Haushaltsartikel"}, "Frosch Fettentferner": {"price": 2.25, "shop": "DM", "cat": "Haushaltsartikel"}, "Frosch Hygiene-Reiniger": {"price": 2.75, "shop": "DM", "cat": "Haushaltsartikel"}, "Isanamed Badesalz": {"price": 2.79, "shop": "DM", "cat": "Körperpflege"}, "Mivolis Totes Meer Badesalz": {"price": 2.65, "shop": "DM", "cat": "Körperpflege"}, "Mivolis Melatonin Spray": {"price": 3.45, "shop": "DM", "cat": "Körperpflege"}, "Visiomax Kombilösung 360ml": {"price": 4.95, "shop": "DM", "cat": "Körperpflege"}, "Lavera Zahncreme": {"price": 3.25, "shop": "DM", "cat": "Körperpflege"}, "Odol Zahnpasta": {"price": 1.1, "shop": "DM", "cat": "Körperpflege"}, "Isana Seife": {"price": 0.85, "shop": "DM", "cat": "Körperpflege"}, "Prof. Einmachgläser 230ml": {"price": 2.95, "shop": "DM", "cat": "Haushaltsartikel"}, "Ingwer Bio": {"price": 1.01, "shop": "Lidl", "cat": "Gemüse"}, "Stilles Wasser 0,5l": {"price": 0.29, "shop": "Lidl", "cat": "Getränke"}, "Orangensaft XXL": {"price": 2.99, "shop": "Lidl", "cat": "Getränke"}, "Softfrüchte Aprikose": {"price": 2.39, "shop": "Lidl", "cat": "Süßigkeiten"}, "Weizenbrötchen 8er": {"price": 1.19, "shop": "Lidl", "cat": "Backwaren"}, "Baguette Bauern": {"price": 0.79, "shop": "Lidl", "cat": "Backwaren"}, "Haselnüsse geröstet": {"price": 3.69, "shop": "Lidl", "cat": "Trockenwaren"}, "Dinkelsandwich": {"price": 1.69, "shop": "Lidl", "cat": "Backwaren"}, "Grobe Bratwurst": {"price": 7.99, "shop": "Lidl", "cat": "Fleisch&Fisch"}, "Banane Fair Bio": {"price": 2.9, "shop": "Lidl", "cat": "Obst"}, "Kürbis Hok Bio": {"price": 2.67, "shop": "Lidl", "cat": "Gemüse"}, "Ananas": {"price": 3.13, "shop": "Lidl", "cat": "Obst"}, "Bauernigurken": {"price": 2.99, "shop": "Lidl", "cat": "Gemüse"}, "Frischer O-Saft": {"price": 2.99, "shop": "Lidl", "cat": "Getränke"}, "Bio Sonnenblumenöl": {"price": 1.65, "shop": "Lidl", "cat": "Sonstiges"}, "Apfelschorle": {"price": 0.43, "shop": "Lidl", "cat": "Getränke"}, "Twix Doppelriegel": {"price": 0.99, "shop": "Lidl", "cat": "Süßigkeiten"}, "Walnusskerne XXL": {"price": 5.99, "shop": "Lidl", "cat": "Trockenwaren"}, "Oreo Kekse": {"price": 1.89, "shop": "Lidl", "cat": "Süßigkeiten"}, "Baguette Körner": {"price": 0.89, "shop": "Lidl", "cat": "Backwaren"}, "Abtei Vitamin D3": {"price": 2.95, "shop": "Lidl", "cat": "Körperpflege"}, "XXL Gr.Bratwurst QS": {"price": 5.99, "shop": "Lidl", "cat": "Fleisch&Fisch"}, "XXL Cevapcici": {"price": 6.99, "shop": "Lidl", "cat": "Fleisch&Fisch"}};
+const BASE_CATALOG = {"Eisbergsalat": {"price": 1.49, "shop": "Lidl", "cat": "Gemüse"}, "Feldsalat": {"price": 1.0, "shop": "Penny", "cat": "Gemüse"}, "Stilles Wasser": {"price": 0.25, "shop": "Lidl", "cat": "Getränke"}, "Mineralwasser": {"price": 0.75, "shop": "Lidl", "cat": "Getränke"}, "Erdbeeren": {"price": 6.98, "shop": "Lidl", "cat": "Obst"}, "Zitronen": {"price": 1.39, "shop": "Lidl", "cat": "Obst"}, "Freilandeier XXL": {"price": 3.99, "shop": "Lidl", "cat": "Fleisch&Fisch"}, "Nuss-Nougat-Creme": {"price": 1.99, "shop": "Lidl", "cat": "Süßigkeiten"}, "Pasta": {"price": 2.59, "shop": "Aldi", "cat": "Trockenwaren"}, "Linsenwaffeln": {"price": 1.35, "shop": "Aldi", "cat": "Trockenwaren"}, "Gurken": {"price": 0.55, "shop": "Lidl", "cat": "Gemüse"}, "Soft Panini": {"price": 0.39, "shop": "Aldi", "cat": "Backwaren"}, "Ziegenfrischkäse": {"price": 1.99, "shop": "Aldi", "cat": "Milchprodukte"}, "Heidelbeeren": {"price": 1.59, "shop": "Aldi", "cat": "Obst"}, "Petersilie": {"price": 2.29, "shop": "Lidl", "cat": "Gemüse"}, "Avocado": {"price": 0.89, "shop": "Aldi", "cat": "Gemüse"}, "Joghurt": {"price": 1.15, "shop": "Aldi", "cat": "Milchprodukte"}, "Mandeln": {"price": 2.29, "shop": "Aldi", "cat": "Trockenwaren"}, "Rindergulasch": {"price": 6.39, "shop": "Aldi", "cat": "Fleisch&Fisch"}, "Spitzpaprika": {"price": 1.89, "shop": "Aldi", "cat": "Gemüse"}, "Wraps": {"price": 1.29, "shop": "Aldi", "cat": "Backwaren"}, "Spätzle": {"price": 2.69, "shop": "Aldi", "cat": "Trockenwaren"}, "Spargel weiß": {"price": 2.44, "shop": "Aldi", "cat": "Gemüse"}, "Hundefutter nass": {"price": 0.75, "shop": "Aldi", "cat": "Hundefutter"}, "Irischer Cheddarkäse": {"price": 2.49, "shop": "Aldi", "cat": "Milchprodukte"}, "Lauchzwiebeln": {"price": 0.63, "shop": "Lidl", "cat": "Gemüse"}, "Gurke": {"price": 0.69, "shop": "Penny", "cat": "Gemüse"}, "Frühkartoffeln": {"price": 2.29, "shop": "Aldi", "cat": "Gemüse"}, "Nektarinen": {"price": 1.79, "shop": "Aldi", "cat": "Obst"}, "Wiener Würstchen": {"price": 5.78, "shop": "Aldi", "cat": "Fleisch&Fisch"}, "Bio Karotten": {"price": 0.99, "shop": "Aldi", "cat": "Gemüse"}, "Bio Honig": {"price": 3.75, "shop": "Aldi", "cat": "Süßigkeiten"}, "Wraps Mehrkorn": {"price": 1.59, "shop": "Aldi", "cat": "Backwaren"}, "Das Rustikale Dinkelbrot": {"price": 1.89, "shop": "Aldi", "cat": "Backwaren"}, "Champignons": {"price": 1.39, "show": "Aldi", "cat": "Gemüse"}, "Bio Reiswaffeln": {"price": 0.65, "shop": "Aldi", "cat": "Trockenwaren"}, "Österreichischer Bergkäse": {"price": 3.99, "shop": "Aldi", "cat": "Milchprodukte"}, "Gouda gerieben": {"price": 1.99, "shop": "Aldi", "cat": "Milchprodukte"}, "Weihenstephan Butter": {"price": 2.29, "shop": "Aldi", "cat": "Milchprodukte"}, "Tomaten": {"price": 1.18, "shop": "Rewe", "cat": "Gemüse"}, "Geflügel Fleischwurst": {"price": 2.79, "shop": "Aldi", "cat": "Fleisch&Fisch"}, "Sonntagsbrötchen": {"price": 1.19, "shop": "Aldi", "cat": "Backwaren"}, "Kartoffeln": {"price": 3.49, "shop": "Aldi", "cat": "Gemüse"}, "Tiefkühlpommes": {"price": 1.79, "shop": "Aldi", "cat": "Gemüse"}, "Lachsfilet": {"price": 9.99, "shop": "Aldi", "cat": "Fleisch&Fisch"}, "Cocktailtomaten": {"price": 1.29, "shop": "Aldi", "cat": "Gemüse"}, "Putenschnitzel": {"price": 4.99, "shop": "Aldi", "cat": "Fleisch&Fisch"}, "Eier": {"price": 2.39, "shop": "Aldi", "cat": "Milchprodukte"}, "Apfelecke": {"price": 0.69, "shop": "Aldi", "cat": "Backwaren"}, "Rispentomaten": {"price": 1.79, "shop": "Penny", "cat": "Gemüse"}, "Buttercroissant": {"price": 0.49, "shop": "Aldi", "cat": "Backwaren"}, "Flabatta": {"price": 0.99, "shop": "Aldi", "cat": "Backwaren"}, "Bio Zucchini": {"price": 0.85, "shop": "Aldi", "cat": "Gemüse"}, "Auberginen": {"price": 0.59, "shop": "Aldi", "cat": "Gemüse"}, "Kohlrabi": {"price": 0.55, "shop": "Aldi", "cat": "Gemüse"}, "H-Sahne": {"price": 0.99, "shop": "Aldi", "cat": "Milchprodukte"}, "Frischkäse Ziege": {"price": 1.59, "shop": "Aldi", "cat": "Milchprodukte"}, "Franzbrötchen": {"price": 0.79, "shop": "Aldi", "cat": "Backwaren"}, "Rinder Burger": {"price": 2.99, "shop": "Aldi", "cat": "Fleisch&Fisch"}, "Hamburger Brötchen": {"price": 0.99, "shop": "Aldi", "cat": "Backwaren"}, "Bananen": {"price": 0.89, "shop": "Aldi", "cat": "Obst"}, "Mayonaise": {"price": 1.69, "shop": "Aldi", "cat": "Sonstiges"}, "Panini": {"price": 1.59, "shop": "Aldi", "cat": "Backwaren"}, "Bio-Joghurt": {"price": 1.99, "shop": "Aldi", "cat": "Milchprodukte"}, "Cheddar gerieben": {"price": 2.49, "shop": "Aldi", "cat": "Milchprodukte"}, "Salami": {"price": 1.99, "shop": "Aldi", "cat": "Fleisch&Fisch"}, "Bratwurst": {"price": 2.59, "shop": "Aldi", "cat": "Fleisch&Fisch"}, "Putengeschnetzeltes XXL": {"price": 5.99, "shop": "Aldi", "cat": "Fleisch&Fisch"}, "Paprika": {"price": 0.99, "shop": "Aldi", "cat": "Gemüse"}, "Bio Babyspinat": {"price": 1.09, "shop": "Aldi", "cat": "Gemüse"}, "Wellenschnittpommes": {"price": 1.79, "shop": "Aldi", "cat": "Gemüse"}, "Griechischer Joghurt": {"price": 2.19, "shop": "Lidl", "cat": "Milchprodukte"}, "Rinder Hamburger": {"price": 4.19, "shop": "Aldi", "cat": "Fleisch&Fisch"}, "Wassermelone": {"price": 1.15, "shop": "Aldi", "cat": "Obst"}, "Geräuchertes Forellenfilet": {"price": 2.49, "shop": "Lidl", "cat": "Fleisch&Fisch"}, "10 Freilandeier": {"price": 2.39, "shop": "Lidl", "cat": "Fleisch&Fisch"}, "Weizenbrötchen": {"price": 0.19, "shop": "Aldi", "cat": "Backwaren"}, "Küchentücher": {"price": 2.85, "shop": "DM", "cat": "Haushaltsartikel"}, "Weizenmehl": {"price": 0.85, "shop": "DM", "cat": "Trockenwaren"}, "Meersalz jodiert": {"price": 0.75, "shop": "DM", "cat": "Trockenwaren"}, "Dinkelmehl": {"price": 1.35, "shop": "DM", "cat": "Trockenwaren"}, "Milch 3,5 %": {"price": 1.15, "shop": "DM", "cat": "Milchprodukte"}, "Senf": {"price": 1.45, "shop": "DM", "cat": "Sonstiges"}, "Toilettenpapier": {"price": 4.89, "shop": "Rossmann", "cat": "Haushaltsartikel"}, "Spülmittel": {"price": 0.95, "shop": "DM", "cat": "Haushaltsartikel"}, "Bio Joghurt": {"price": 1.15, "shop": "Aldi", "cat": "Milchprodukte"}, "Brokkoli": {"price": 0.75, "shop": "Aldi", "cat": "Gemüse"}, "Breite Bohnen": {"price": 1.89, "shop": "Aldi", "cat": "Gemüse"}, "Bio Bergbauernkäse": {"price": 3.49, "shop": "Aldi", "cat": "Milchprodukte"}, "Hähnchen Flügel": {"price": 5.59, "shop": "Aldi", "cat": "Fleisch&Fisch"}, "Kerrygold Butter": {"price": 3.99, "shop": "Lidl", "cat": "Milchprodukte"}, "Suppengemüse": {"price": 1.69, "shop": "Aldi", "cat": "Gemüse"}, "Pirinc Reis": {"price": 9.99, "shop": "Bakal Dogan", "cat": "Trockenwaren"}, "Zwiebeln": {"price": 1.99, "shop": "Aldi", "cat": "Gemüse"}, "Bio Salami": {"price": 1.99, "shop": "Aldi", "cat": "Fleisch&Fisch"}, "Mini Gurken": {"price": 0.99, "shop": "Aldi", "cat": "Gemüse"}, "Spargel": {"price": 2.44, "shop": "Aldi", "cat": "Gemüse"}, "Möhren": {"price": 1.89, "shop": "Lidl", "cat": "Gemüse"}, "Sellerie": {"price": 0.99, "shop": "Aldi", "cat": "Gemüse"}, "Hähnchenschenkel": {"price": 3.99, "shop": "Aldi", "cat": "Fleisch&Fisch"}, "Lachsfilets": {"price": 9.99, "shop": "Aldi", "cat": "Fleisch&Fisch"}, "Knoblauch": {"price": 0.49, "shop": "Aldi", "cat": "Gemüse"}, "Speck": {"price": 1.99, "shop": "Aldi", "cat": "Fleisch&Fisch"}, "Steak": {"price": 8.99, "shop": "Aldi", "cat": "Fleisch&Fisch"}, "Salat": {"price": 0.99, "shop": "Aldi", "cat": "Gemüse"}, "Salatdressing": {"price": 1.49, "shop": "Aldi", "cat": "Sonstiges"}, "Cheddarkäse": {"price": 2.49, "shop": "Aldi", "cat": "Milchprodukte"}, "Sauerteig": {"price": 1.99, "shop": "Aldi", "cat": "Backwaren"}, "Hühnerbrühe": {"price": 0.99, "shop": "Aldi", "cat": "Sonstiges"}, "Bio Bananen": {"price": 0.27, "shop": "Penny", "cat": "Obst"}, "Mortadella": {"price": 1.99, "shop": "Penny", "cat": "Fleisch&Fisch"}, "Geflügelsalami": {"price": 1.99, "shop": "Penny", "cat": "Fleisch&Fisch"}, "Cheddar": {"price": 2.79, "shop": "Penny", "cat": "Milchprodukte"}, "Laugenbrezel": {"price": 0.39, "shop": "Penny", "cat": "Backwaren"}, "Laugenstange": {"price": 0.39, "shop": "Aldi", "cat": "Backwaren"}, "Berliner": {"price": 0.45, "shop": "Penny", "cat": "Backwaren"}, "Bio Körner Sandwich": {"price": 1.79, "shop": "Penny", "cat": "Backwaren"}, "Bio Zitrone": {"price": 1.49, "shop": "Penny", "cat": "Obst"}, "Sprühsahne 30%": {"price": 2.19, "shop": "Penny", "cat": "Milchprodukte"}, "Nuss Nougat Eis": {"price": 3.49, "shop": "Penny", "cat": "Süßigkeiten"}, "Doritos BBQ": {"price": 1.11, "shop": "Penny", "cat": "Trockenwaren"}, "Cola": {"price": 0.99, "shop": "Penny", "cat": "Getränke"}, "Rind Hack 500g": {"price": 4.33, "shop": "Aldi", "cat": "Fleisch&Fisch"}, "Mandarinen": {"price": 1.79, "shop": "Aldi", "cat": "Obst"}, "Sahnejoghurt": {"price": 2.19, "shop": "Aldi", "cat": "Milchprodukte"}, "Apfel rot": {"price": 3.29, "shop": "Lidl", "cat": "Obst"}, "Rustikales Baguette": {"price": 0.65, "shop": "Aldi", "cat": "Backwaren"}, "Feldsalat 150g": {"price": 1.49, "shop": "Aldi", "cat": "Gemüse"}, "Nussmischung": {"price": 3.49, "shop": "Aldi", "cat": "Trockenwaren"}, "Paprika rot": {"price": 2.45, "shop": "Aldi", "cat": "Gemüse"}, "Toffifee": {"price": 3.79, "shop": "Aldi", "cat": "Süßigkeiten"}, "Riesling feinherb": {"price": 2.79, "shop": "Aldi", "cat": "Alkoholische Getränke"}, "San Benedetto 1,5l": {"price": 0.79, "shop": "Aldi", "cat": "Getränke"}, "Haferflocken kernig": {"price": 0.69, "shop": "Aldi", "cat": "Trockenwaren"}, "Haferflocken zart": {"price": 0.69, "shop": "Aldi", "cat": "Trockenwaren"}, "Caffe Crema": {"price": 12.99, "shop": "Aldi", "cat": "Getränke"}, "Nuss-Nougat-Croissant": {"price": 0.69, "shop": "Aldi", "cat": "Backwaren"}, "Mineralwasser 500ml": {"price": 0.34, "shop": "Aldi", "cat": "Getränke"}, "Laugen Brioche": {"price": 1.99, "shop": "Aldi", "cat": "Backwaren"}, "Geflügel-Frischwurst": {"price": 1.29, "shop": "Aldi", "cat": "Fleisch&Fisch"}, "Dauerwurst-Aufschnitt": {"price": 1.69, "shop": "Aldi", "cat": "Fleisch&Fisch"}, "Rettertüte": {"price": 3.0, "shop": "Lidl", "cat": "Sonstiges"}, "Bio Zitronen": {"price": 2.99, "shop": "Lidl", "cat": "Obst"}, "Geflügel Mortadella": {"price": 0.89, "shop": "Lidl", "cat": "Fleisch&Fisch"}, "Butter": {"price": 1.19, "shop": "Lidl", "cat": "Milchprodukte"}, "Forellenfilets": {"price": 2.49, "shop": "Lidl", "cat": "Fleisch&Fisch"}, "Ziegenfrischkäse Natur": {"price": 1.99, "shop": "Lidl", "cat": "Milchprodukte"}, "Olivenöl": {"price": 5.99, "shop": "Lidl", "cat": "Sonstiges"}, "Eier Freiland XXL": {"price": 4.99, "shop": "Lidl", "cat": "Milchprodukte"}, "Remoulade": {"price": 0.75, "shop": "Lidl", "cat": "Sonstiges"}, "Brunchmix Brötchen": {"price": 1.49, "shop": "Lidl", "cat": "Backwaren"}, "Snack-Mandeln": {"price": 3.49, "shop": "Lidl", "cat": "Trockenwaren"}, "Hähnchen-Geschnetzeltes": {"price": 3.99, "shop": "Lidl", "cat": "Fleisch&Fisch"}, "Abtei Magnesium": {"price": 2.59, "shop": "Lidl", "cat": "Sonstiges"}, "dmBio Milch 3,5% 1L": {"price": 1.25, "shop": "DM", "cat": "Milchprodukte"}, "dmBio Schoko Reiswaffeln": {"price": 1.45, "shop": "DM", "cat": "Süßigkeiten"}, "dmBio Nuss-Nougat Creme": {"price": 2.95, "shop": "DM", "cat": "Süßigkeiten"}, "dmBio Pistaziencreme": {"price": 4.95, "shop": "DM", "cat": "Süßigkeiten"}, "dmBio Spirelli 500g": {"price": 0.85, "shop": "DM", "cat": "Trockenwaren"}, "dmBio Spaghetti 500g": {"price": 0.85, "shop": "DM", "cat": "Trockenwaren"}, "dmBio Penne 500g": {"price": 0.85, "shop": "DM", "cat": "Trockenwaren"}, "dmBio Tagliatelle 500g": {"price": 1.45, "shop": "DM", "cat": "Trockenwaren"}, "dmBio Weizenmehl Type": {"price": 0.85, "shop": "DM", "cat": "Trockenwaren"}, "dmBio Rohrohrzucker 1000g": {"price": 1.95, "shop": "DM", "cat": "Trockenwaren"}, "dmBio Cornflakes ungesüßt": {"price": 1.25, "shop": "DM", "cat": "Trockenwaren"}, "dmBio Passata 690g": {"price": 1.05, "shop": "DM", "cat": "Trockenwaren"}, "dmBio Haferflocken Feinblatt": {"price": 2.85, "shop": "DM", "cat": "Trockenwaren"}, "dmBio Haferflocken": {"price": 1.49, "shop": "DM", "cat": "Trockenwaren"}, "dmBio Kastanien Dinkelk.": {"price": 1.95, "shop": "DM", "cat": "Trockenwaren"}, "dmBio Nuss n Choc": {"price": 0.95, "shop": "DM", "cat": "Süßigkeiten"}, "dmBio Gelierzucker 500g": {"price": 2.45, "shop": "DM", "cat": "Trockenwaren"}, "dmBio Apfelessig 750ml": {"price": 1.55, "shop": "DM", "cat": "Sonstiges"}, "dmBio Passata 4x": {"price": 1.05, "shop": "DM", "cat": "Trockenwaren"}, "dmBio Mandel Drink 1l": {"price": 1.35, "shop": "DM", "cat": "Milchprodukte"}, "dmBio Birne-Erdb.Apfel": {"price": 0.75, "shop": "DM", "cat": "Getränke"}, "dmBio Haferdrink Zucke": {"price": 0.9, "shop": "DM", "cat": "Getränke"}, "dmBio Gemüsebrüh. h.Nac": {"price": 2.45, "shop": "DM", "cat": "Sonstiges"}, "FF Quetschie Apf.Erd.Blau": {"price": 0.95, "shop": "DM", "cat": "Süßigkeiten"}, "Dein Bestes Hundefutter Huhn": {"price": 0.75, "shop": "DM", "cat": "Hundefutter"}, "Dein Bestes Bio Hundefutter": {"price": 0.65, "shop": "DM", "cat": "Hundefutter"}, "dmBio mini Elisen Lebkuchen": {"price": 2.1, "shop": "DM", "cat": "Süßigkeiten"}, "Goldbesteckmuster Artd 400g": {"price": 1.15, "shop": "DM", "cat": "Sonstiges"}, "Saphir Meersalz 500g": {"price": 0.75, "shop": "DM", "cat": "Haushaltsartikel"}, "Saphir Meersalz mit Jod": {"price": 0.75, "shop": "DM", "cat": "Haushaltsartikel"}, "Saphir Kochsalz": {"price": 0.75, "shop": "DM", "cat": "Haushaltsartikel"}, "Ivorell Mineralwasser Still": {"price": 0.45, "shop": "DM", "cat": "Getränke"}, "Denkmit Spülmittel Lavendel": {"price": 0.95, "shop": "DM", "cat": "Haushaltsartikel"}, "Denkmit Hygienespüler": {"price": 1.25, "shop": "DM", "cat": "Haushaltsartikel"}, "Denkmit Oxi Energy": {"price": 2.25, "shop": "DM", "cat": "Waschmittel"}, "Denkmit Anti-Kalk-Gel": {"price": 2.45, "shop": "DM", "cat": "Haushaltsartikel"}, "Denkmit MGR Tabs XL": {"price": 4.49, "shop": "DM", "cat": "Haushaltsartikel"}, "Denkmit Klarspüler": {"price": 0.99, "shop": "DM", "cat": "Haushaltsartikel"}, "Denkmit Spezial-Salz": {"price": 0.8, "shop": "DM", "cat": "Haushaltsartikel"}, "Denkmit Oxi Power Weiss": {"price": 2.25, "shop": "DM", "cat": "Waschmittel"}, "Denkmit Fleckensalz": {"price": 1.15, "shop": "DM", "cat": "Waschmittel"}, "Denkmit Wollwaschmittel": {"price": 2.15, "shop": "DM", "cat": "Waschmittel"}, "Frosch Bio-Spiritus Reiniger": {"price": 2.25, "shop": "DM", "cat": "Haushaltsartikel"}, "Frosch Fettentferner": {"price": 2.25, "shop": "DM", "cat": "Haushaltsartikel"}, "Frosch Hygiene-Reiniger": {"price": 2.75, "shop": "DM", "cat": "Haushaltsartikel"}, "Isanamed Badesalz": {"price": 2.79, "shop": "DM", "cat": "Körperpflege"}, "Mivolis Totes Meer Badesalz": {"price": 2.65, "shop": "DM", "cat": "Körperpflege"}, "Mivolis Melatonin Spray": {"price": 3.45, "shop": "DM", "cat": "Körperpflege"}, "Visiomax Kombilösung 360ml": {"price": 4.95, "shop": "DM", "cat": "Körperpflege"}, "Lavera Zahncreme": {"price": 3.25, "shop": "DM", "cat": "Körperpflege"}, "Odol Zahnpasta": {"price": 1.1, "shop": "DM", "cat": "Körperpflege"}, "Isana Seife": {"price": 0.85, "shop": "DM", "cat": "Körperpflege"}, "Prof. Einmachgläser 230ml": {"price": 2.95, "shop": "DM", "cat": "Haushaltsartikel"}, "Ingwer Bio": {"price": 1.01, "shop": "Lidl", "cat": "Gemüse"}, "Stilles Wasser 0,5l": {"price": 0.29, "shop": "Lidl", "cat": "Getränke"}, "Orangensaft XXL": {"price": 2.99, "shop": "Lidl", "cat": "Getränke"}, "Softfrüchte Aprikose": {"price": 2.39, "shop": "Lidl", "cat": "Süßigkeiten"}, "Weizenbrötchen 8er": {"price": 1.19, "shop": "Lidl", "cat": "Backwaren"}, "Baguette Bauern": {"price": 0.79, "shop": "Lidl", "cat": "Backwaren"}, "Haselnüsse geröstet": {"price": 3.69, "shop": "Lidl", "cat": "Trockenwaren"}, "Dinkelsandwich": {"price": 1.69, "shop": "Lidl", "cat": "Backwaren"}, "Grobe Bratwurst": {"price": 7.99, "shop": "Lidl", "cat": "Fleisch&Fisch"}, "Banane Fair Bio": {"price": 2.9, "shop": "Lidl", "cat": "Obst"}, "Kürbis Hok Bio": {"price": 2.67, "shop": "Lidl", "cat": "Gemüse"}, "Ananas": {"price": 3.13, "shop": "Lidl", "cat": "Obst"}, "Bauernigurken": {"price": 2.99, "shop": "Lidl", "cat": "Gemüse"}, "Frischer O-Saft": {"price": 2.99, "shop": "Lidl", "cat": "Getränke"}, "Bio Sonnenblumenöl": {"price": 1.65, "shop": "Lidl", "cat": "Sonstiges"}, "Apfelschorle": {"price": 0.43, "shop": "Lidl", "cat": "Getränke"}, "Twix Doppelriegel": {"price": 0.99, "shop": "Lidl", "cat": "Süßigkeiten"}, "Walnusskerne XXL": {"price": 4.99, "shop": "Lidl", "cat": "Trockenwaren"}, "Oreo Kekse": {"price": 1.89, "shop": "Lidl", "cat": "Süßigkeiten"}, "Baguette Körner": {"price": 0.89, "shop": "Lidl", "cat": "Backwaren"}, "Abtei Vitamin D3": {"price": 2.95, "shop": "Lidl", "cat": "Körperpflege"}, "XXL Gr.Bratwurst QS": {"price": 5.99, "shop": "Lidl", "cat": "Fleisch&Fisch"}, "XXL Cevapcici": {"price": 6.99, "shop": "Lidl", "cat": "Fleisch&Fisch"}, "Rib Eye Steak": {"price": 6.0, "shop": "Lidl", "cat": "Fleisch&Fisch"}, "Snack Gurken": {"price": 0.99, "shop": "Lidl", "cat": "Gemüse"}, "Bio-Honig flüssig": {"price": 3.75, "shop": "Lidl", "cat": "Süßigkeiten"}, "Eier 10er Freilandhaltung": {"price": 2.99, "shop": "Lidl", "cat": "Milchprodukte"}, "Vegane Karamellkekse": {"price": 2.54, "shop": "Lidl", "cat": "Süßigkeiten"}, "Haribo Goldbären": {"price": 1.19, "shop": "Lidl", "cat": "Süßigkeiten"}, "Chips BBQ": {"price": 1.39, "shop": "Lidl", "cat": "Trockenwaren"}, "Haribo Goldbär Wild": {"price": 1.19, "shop": "Lidl", "cat": "Süßigkeiten"}, "Proteinr.veg. Cookie": {"price": 0.75, "shop": "Lidl", "cat": "Süßigkeiten"}, "Tetesept Vit. C 600": {"price": 3.99, "shop": "Lidl", "cat": "Drogerie"}, "Dinkelvollkornbrot": {"price": 0.49, "shop": "Lidl", "cat": "Backwaren"}, "Hundesnack Entenfilet": {"price": 3.29, "shop": "Lidl", "cat": "Hundefutter"}, "Hundevollnahrung II": {"price": 0.65, "shop": "Lidl", "cat": "Hundefutter"}, "Hundenassnahrung Kalb": {"price": 0.65, "shop": "Lidl", "cat": "Hundefutter"}, "Grobe Bratwurst QS": {"price": 2.59, "shop": "Lidl", "cat": "Fleisch&Fisch"}, "Frühkartoffeln 2,5kg": {"price": 3.49, "shop": "Aldi", "cat": "Gemüse"}, "Kakao": {"price": 7.99, "shop": "Aldi", "cat": "Trockenwaren"}, "Eisschale Tricolor": {"price": 2.49, "shop": "Aldi", "cat": "Süßigkeiten"}, "Traubensaft 2in1": {"price": 1.29, "shop": "Aldi", "cat": "Getränke"}, "Hundefutter 150g": {"price": 0.45, "shop": "Aldi", "cat": "Hundefutter"}, "Erdbeeren 800g": {"price": 2.49, "shop": "Aldi", "cat": "Obst"}, "Haribo Dose": {"price": 0.89, "shop": "Aldi", "cat": "Süßigkeiten"}, "Dt. Markenbutter 250g": {"price": 1.05, "shop": "Aldi", "cat": "Milchprodukte"}, "Zitronen Bio 500g": {"price": 1.59, "shop": "Aldi", "cat": "Obst"}, "Irischer Cheddar": {"price": 2.19, "shop": "Aldi", "cat": "Milchprodukte"}, "Bio-Käsegenuss": {"price": 1.59, "shop": "Aldi", "cat": "Milchprodukte"}, "Gouda gr. 250g": {"price": 1.79, "shop": "Aldi", "cat": "Milchprodukte"}, "Bio Ice Pops XXL": {"price": 3.99, "shop": "Aldi", "cat": "Süßigkeiten"}, "Hähn. Gesch. Gyros": {"price": 4.99, "shop": "Aldi", "cat": "Fleisch&Fisch"}, "Mohnschnecke": {"price": 1.99, "shop": "Aldi", "cat": "Backwaren"}, "F&G Rumpsteak": {"price": 8.88, "shop": "Aldi", "cat": "Fleisch&Fisch"}, "Super-Berliner": {"price": 0.59, "shop": "Aldi", "cat": "Backwaren"}, "Weltmeisterbrot": {"price": 0.39, "shop": "Aldi", "cat": "Backwaren"}, "Walnussbrötchen": {"price": 0.59, "shop": "Aldi", "cat": "Backwaren"}, "Sonnentomaten lose": {"price": 5.78, "shop": "Aldi", "cat": "Gemüse"}, "HP Mousse 200g": {"price": 1.19, "shop": "Aldi", "cat": "Milchprodukte"}, "Balla Stixx": {"price": 1.69, "shop": "Rewe", "cat": "Süßigkeiten"}, "Haribo Fruitmani": {"price": 1.19, "shop": "Rewe", "cat": "Süßigkeiten"}, "Hofst. Port. WH": {"price": 3.99, "shop": "Rewe", "cat": "Sonstiges"}, "Ja! Mineralwasser": {"price": 0.29, "shop": "Rewe", "cat": "Getränke"}, "Alouette Rectopa": {"price": 4.89, "shop": "Rossmann", "cat": "Kosmetik"}, "Tetesept Nasendusche": {"price": 12.99, "shop": "Rossmann", "cat": "Drogerie"}, "Super Softball": {"price": 5.99, "shop": "Rossmann", "cat": "Freizeit"}, "Naturalis Classic 0,5l": {"price": 0.15, "shop": "Netto", "cat": "Getränke"}, "Vehappy Eis Buttkoch 500ml": {"price": 1.95, "shop": "Netto", "cat": "Süßigkeiten"}, "Vehappy Eis sort. 500ml": {"price": 1.99, "shop": "Netto", "cat": "Süßigkeiten"}, "Bio-Mohnbrötchen": {"price": 1.0, "shop": "Netto", "cat": "Backwaren"}, "Bio-Sesambrötchen": {"price": 1.0, "shop": "Netto", "cat": "Backwaren"}, "Saemereien PG2": {"price": 0.49, "shop": "Netto", "cat": "Sonstiges"}, "Saemereien PG1": {"price": 0.19, "shop": "Netto", "cat": "Sonstiges"}, "Branntweinessig 1L": {"price": 0.59, "shop": "Aldi", "cat": "Sonstiges"}, "Thunfisch 4er Pack": {"price": 4.99, "shop": "Aldi", "cat": "Fleisch&Fisch"}, "Dinkelmehl T630": {"price": 1.09, "shop": "Aldi", "cat": "Trockenwaren"}, "Bio Weizenmehl": {"price": 0.85, "shop": "Aldi", "cat": "Trockenwaren"}, "Apfeldireksaft 1l": {"price": 1.29, "shop": "Aldi", "cat": "Getränke"}, "Traubendirektsa 1l": {"price": 1.49, "shop": "Aldi", "cat": "Getränke"}, "Frischk. Kräuter": {"price": 1.59, "shop": "Aldi", "cat": "Milchprodukte"}, "Milka 81-100g": {"price": 0.99, "shop": "Aldi", "cat": "Süßigkeiten"}, "Norweg. Lachsfilet": {"price": 7.49, "shop": "Aldi", "cat": "Fleisch&Fisch"}, "Laminierfolien": {"price": 2.99, "shop": "Aldi", "cat": "Sonstiges"}, "Spargel w/v 500g": {"price": 3.49, "shop": "Aldi", "cat": "Gemüse"}, "Mini Romarispent.": {"price": 1.11, "shop": "Aldi", "cat": "Gemüse"}, "SURF Limonata": {"price": 0.59, "shop": "Norma", "cat": "Getränke"}, "Premium Cherryrispen": {"price": 3.33, "shop": "Norma", "cat": "Gemüse"}, "Bauerngurken": {"price": 2.99, "shop": "Lidl", "cat": "Gemüse"}, "Bunte Eier Bodenhaltung": {"price": 2.99, "shop": "Lidl", "cat": "Milchprodukte"}, "Hund nass 300g": {"price": 0.75, "shop": "Aldi", "cat": "Hundefutter"}, "Rind Burger 260g": {"price": 3.49, "shop": "Aldi", "cat": "Fleisch&Fisch"}, "Bio PNL Salami 80g": {"price": 1.99, "shop": "Aldi", "cat": "Fleisch&Fisch"}, "Rispen tomaten 650g": {"price": 2.99, "shop": "Aldi", "cat": "Gemüse"}, "Reiswaffel m. Honig": {"price": 1.49, "shop": "Aldi", "cat": "Süßigkeiten"}, "Paulberger Limo": {"price": 1.29, "shop": "Aldi", "cat": "Getränke"}, "Gurke Bio Stk": {"price": 0.66, "shop": "Aldi", "cat": "Gemüse"}, "Lakfr H-Sahne 200g": {"price": 1.09, "shop": "Aldi", "cat": "Milchprodukte"}, "Bio-Heidelb. 125g": {"price": 1.09, "shop": "Aldi", "cat": "Obst"}, "Leder Hausschuhe": {"price": 9.99, "shop": "Aldi", "cat": "Kleidung"}, "Lammfilet mariniert": {"price": 18.61, "shop": "Lidl", "cat": "Fleisch&Fisch"}, "Granatapfel": {"price": 1.29, "shop": "Lidl", "cat": "Obst"}, "Pflaumen dunkel": {"price": 1.89, "shop": "Lidl", "cat": "Obst"}, "Bio Baby Spinat": {"price": 1.99, "shop": "Lidl", "cat": "Gemüse"}, "Romana Salat": {"price": 1.19, "shop": "Lidl", "cat": "Gemüse"}, "Romatomaten": {"price": 1.49, "shop": "Lidl", "cat": "Gemüse"}, "Paprika grün spitz": {"price": 1.49, "shop": "Lidl", "cat": "Gemüse"}, "Griech. Joghurt 10%": {"price": 2.19, "shop": "Lidl", "cat": "Milchprodukte"}, "QS Rohwurst Salami": {"price": 2.99, "shop": "Lidl", "cat": "Fleisch&Fisch"}, "Griechischer Feta": {"price": 2.49, "shop": "Lidl", "cat": "Milchprodukte"}, "Surig Essig-Essenz": {"price": 4.49, "shop": "Lidl", "cat": "Sonstiges"}, "Olivenöl Virgen Ext.": {"price": 19.99, "shop": "Lidl", "cat": "Sonstiges"}, "Die Feine Himbeere": {"price": 1.29, "shop": "Lidl", "cat": "Süßigkeiten"}, "Melatonin Tabletten": {"price": 1.29, "shop": "Lidl", "cat": "Drogerie"}, "Brot Ciabatta": {"price": 0.79, "shop": "Lidl", "cat": "Backwaren"}, "Solaya Dürüm Wr": {"price": 1.99, "shop": "Lidl", "cat": "Backwaren"}, "Haribo Mar.K.Veggie": {"price": 0.89, "shop": "Lidl", "cat": "Süßigkeiten"}, "Haribo Mario K.sauer": {"price": 0.89, "shop": "Lidl", "cat": "Süßigkeiten"}, "Bio Mini Haferc. Scho": {"price": 1.49, "shop": "Lidl", "cat": "Trockenwaren"}, "Kuchenriegel Schoko": {"price": 0.99, "shop": "Lidl", "cat": "Süßigkeiten"}, "XXL Lachsfilet": {"price": 15.99, "shop": "Lidl", "cat": "Fleisch&Fisch"}, "Melone Wasser": {"price": 1.99, "shop": "Lidl", "cat": "Obst"}, "Strauchtomaten": {"price": 3.79, "shop": "Lidl", "cat": "Gemüse"}, "Bio Feldsalat": {"price": 1.49, "shop": "Lidl", "cat": "Gemüse"}, "Zitronen 750g": {"price": 1.99, "shop": "Lidl", "cat": "Obst"}, "BackofenFeine Pommes": {"price": 1.49, "shop": "Lidl", "cat": "Gemüse"}, "Gouda Scheiben": {"price": 1.45, "shop": "Lidl", "cat": "Milchprodukte"}, "Ziegenkäserolle": {"price": 3.49, "shop": "Lidl", "cat": "Milchprodukte"}, "Ziegenfrischk. Natur": {"price": 2.19, "shop": "Lidl", "cat": "Milchprodukte"}, "Frischkäse Kräuter": {"price": 1.99, "shop": "Lidl", "cat": "Milchprodukte"}, "Fanta Zero Tutti Fr.": {"price": 0.99, "shop": "Lidl", "cat": "Getränke"}, "Croissant Wien.": {"price": 0.99, "shop": "Lidl", "cat": "Backwaren"}, "Laugen Brezel": {"price": 0.39, "shop": "Lidl", "cat": "Backwaren"}, "Hähnch. Minischnitzel": {"price": 4.99, "shop": "Lidl", "cat": "Fleisch&Fisch"}, "Autogas LPG": {"price": 1.079, "shop": "JET", "cat": "Sonstiges"}};
 
 // Katalog: BASE_CATALOG als Basis, aber gespeicherte Preisanpassungen haben dauerhaft Vorrang
 const savedCatalog = JSON.parse(localStorage.getItem("ek_catalog") || "{}");
@@ -661,7 +730,7 @@ function getTodayIdx() { const d=new Date().getDay(); return d===0?6:d-1; }
 // ── TABS ──
 function switchTab(tab) {
   currentTab = tab;
-  ["liste","rezepte","woche","markt"].forEach(t => {
+  ["liste","rezepte","woche","markt","fridge"].forEach(t => {
     document.getElementById("view-"+t).style.display = t===tab ? "flex" : "none";
     document.getElementById("tab-"+t).classList.toggle("active", t===tab);
   });
@@ -669,6 +738,7 @@ function switchTab(tab) {
   if(tab==="rezepte") renderRecipes();
   if(tab==="woche") renderWeek();
   if(tab==="markt") renderMarkt();
+  if(tab==="fridge") renderFridge();
 }
 
 // ── WOCHENPLAN ──
@@ -1010,7 +1080,16 @@ function modalOk() {
 function toggleDone(id) { const i=list.find(i=>i.id===id); if(i) i.done=!i.done; saveList(); renderList(); }
 function deleteItem(id) { list=list.filter(i=>i.id!==id); saveList(); renderList(); }
 function clearDone() { list=list.filter(i=>!i.done); saveList(); renderList(); showToast("Erledigte entfernt"); }
-function resetChecks() { list.forEach(i=>i.done=false); saveList(); renderList(); showToast("Bereit für neuen Einkauf ✓"); }
+function resetChecks() {
+  recordPurchase();
+  // Aktuelle Liste in lists speichern
+  lists[currentListId] = [...list];
+  saveLists();
+  list.forEach(i=>i.done=false);
+  saveList();
+  renderList();
+  showToast("Einkauf gespeichert ✓ Bereit für neuen Einkauf!");
+}
 
 // ── RENDER LISTE ──
 function renderList() {
@@ -1019,6 +1098,8 @@ function renderList() {
   document.getElementById("valTotal").textContent=fmt(total);
   document.getElementById("valDone").textContent=fmt(done);
   updateBudgetDisplay();
+  const lbl = document.getElementById("currentListLabel");
+  if(lbl) lbl.textContent = "🛒 " + (currentListId === "default" ? "Hauptliste" : currentListId);
   const c=document.getElementById("scrollList");
   if(!list.length) {
     c.innerHTML=`<div class="empty"><div class="empty-icon">🛒</div><p>Suche nach Artikeln<br>oder wähle ein <strong style="color:var(--mint);">Rezept</strong><br>um <span style="color:var(--mint);font-weight:600;">Zutaten</span> direkt hinzuzufügen!</p></div>`; return;
@@ -1149,6 +1230,312 @@ function renderMarkt() {
       </div>`).join('');
   });
   container.innerHTML = html;
+}
+
+
+// ── MEHRERE LISTEN ──
+let lists = JSON.parse(localStorage.getItem("ik_lists") || "{}");
+let currentListId = localStorage.getItem("ik_current_list") || "default";
+
+function saveLists() { localStorage.setItem("ik_lists", JSON.stringify(lists)); }
+function setCurrentList(id) {
+  // Aktuelle Liste speichern
+  lists[currentListId] = [...list];
+  saveLists();
+  // Neue Liste laden
+  currentListId = id;
+  localStorage.setItem("ik_current_list", id);
+  list = lists[id] ? [...lists[id]] : [];
+  saveList();
+  renderList();
+  closeListsOverlay();
+  showToast("Liste: " + (id === "default" ? "Hauptliste" : id));
+}
+
+function createNewList() {
+  const name = document.getElementById("newListName").value.trim();
+  if(!name) return;
+  // Aktuelle speichern
+  lists[currentListId] = [...list];
+  saveLists();
+  // Neue anlegen
+  currentListId = name;
+  localStorage.setItem("ik_current_list", name);
+  list = [];
+  saveList();
+  document.getElementById("newListName").value = "";
+  renderList();
+  renderListsOverlay();
+  showToast("✓ Liste '" + name + "' erstellt");
+}
+
+function deleteList(id) {
+  if(id === "default") { showToast("Hauptliste kann nicht gelöscht werden"); return; }
+  delete lists[id];
+  saveLists();
+  if(currentListId === id) {
+    currentListId = "default";
+    localStorage.setItem("ik_current_list", "default");
+    list = lists["default"] ? [...lists["default"]] : [];
+    saveList();
+    renderList();
+  }
+  renderListsOverlay();
+  showToast("Liste gelöscht");
+}
+
+function openLists() {
+  // Aktuelle Liste in lists speichern
+  lists[currentListId] = [...list];
+  saveLists();
+  renderListsOverlay();
+  document.getElementById("listsOverlay").style.display = "flex";
+}
+function closeListsOverlay(e) {
+  if(!e || e.target === document.getElementById("listsOverlay"))
+    document.getElementById("listsOverlay").style.display = "none";
+}
+function renderListsOverlay() {
+  const allLists = {"default": lists["default"]||[], ...lists};
+  const container = document.getElementById("listsContainer");
+  container.innerHTML = Object.entries(allLists).map(([id, items]) => {
+    const arr = Array.isArray(items) ? items : [];
+    const total = arr.reduce((s,i)=>s+getPrice(i.name)*(i.qty||1),0);
+    const done = arr.filter(i=>i.done).length;
+    const isActive = id === currentListId;
+    return `<div style="display:flex;align-items:center;padding:14px 18px;border-bottom:1px solid var(--line);gap:12px;${isActive?'background:rgba(91,191,181,0.06)':''}" onclick="setCurrentList('${encodeURIComponent(id)}')">
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:0.92rem;font-weight:${isActive?'700':'500'};color:${isActive?'var(--mint)':'var(--dark)'}">${id==='default'?'🛒 Hauptliste':id}</div>
+        <div style="font-size:0.72rem;color:var(--pale);margin-top:2px;">${arr.length} Artikel · ${done} erledigt · ${fmt(total)}</div>
+      </div>
+      ${isActive ? '<span style="font-size:0.72rem;font-weight:700;color:var(--mint);background:rgba(91,191,181,0.15);padding:3px 10px;border-radius:10px;">Aktiv</span>' : ''}
+      ${id !== 'default' ? `<button onclick="event.stopPropagation();deleteList('${encodeURIComponent(id)}')" style="background:none;border:none;color:var(--pale);font-size:1rem;cursor:pointer;padding:4px;">✕</button>` : ''}
+    </div>`;
+  }).join("");
+}
+
+// Beim Start aktuelle Liste laden
+(function initLists() {
+  list = lists[currentListId] ? [...lists[currentListId]] : list;
+})();
+
+// ── AUSGABEN-TRACKER ──
+let purchases = JSON.parse(localStorage.getItem("ik_purchases") || "[]");
+function savePurchases() { localStorage.setItem("ik_purchases", JSON.stringify(purchases)); }
+
+function recordPurchase() {
+  const total = list.reduce((s,i)=>s+getPrice(i.name)*(i.qty||1),0);
+  if(total <= 0) return;
+  const cats = {};
+  list.forEach(i => {
+    const cat = catalog[i.name]?.cat || "Sonstiges";
+    cats[cat] = (cats[cat]||0) + getPrice(i.name)*(i.qty||1);
+  });
+  purchases.push({
+    date: new Date().toISOString(),
+    total,
+    cats,
+    listName: currentListId === "default" ? "Hauptliste" : currentListId,
+    itemCount: list.length
+  });
+  savePurchases();
+}
+
+function openStats() {
+  renderStats();
+  document.getElementById("statsOverlay").style.display = "flex";
+}
+function closeStatsOverlay(e) {
+  if(!e || e.target === document.getElementById("statsOverlay"))
+    document.getElementById("statsOverlay").style.display = "none";
+}
+
+function renderStats() {
+  const container = document.getElementById("statsContainer");
+  if(purchases.length === 0) {
+    container.innerHTML = `<div class="empty"><div class="empty-icon">📊</div><p>Noch keine Einkäufe aufgezeichnet.<br>Klicke auf <strong style="color:var(--mint);">↺ Neuer Einkauf</strong><br>um einen Einkauf abzuschließen.</p></div>`;
+    return;
+  }
+
+  // Woche + Monat berechnen
+  const now = new Date();
+  const weekStart = new Date(now); weekStart.setDate(now.getDate() - now.getDay() + 1); weekStart.setHours(0,0,0,0);
+  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+
+  const weekly = purchases.filter(p => new Date(p.date) >= weekStart);
+  const monthly = purchases.filter(p => new Date(p.date) >= monthStart);
+
+  const weekTotal = weekly.reduce((s,p)=>s+p.total,0);
+  const monthTotal = monthly.reduce((s,p)=>s+p.total,0);
+
+  // Kategorien diesen Monat
+  const monthlyCats = {};
+  monthly.forEach(p => Object.entries(p.cats||{}).forEach(([cat,val]) => {
+    monthlyCats[cat] = (monthlyCats[cat]||0) + val;
+  }));
+
+  const sortedCats = Object.entries(monthlyCats).sort((a,b)=>b[1]-a[1]);
+  const maxCat = sortedCats[0]?.[1] || 1;
+
+  // Letzte 8 Einkäufe
+  const recent = [...purchases].reverse().slice(0,8);
+
+  container.innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px;">
+      <div style="background:var(--bg);border-radius:12px;padding:14px;">
+        <div style="font-size:0.62rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--pale);margin-bottom:4px;">Diese Woche</div>
+        <div style="font-family:'Playfair Display',serif;font-size:1.4rem;color:var(--mint);">${fmt(weekTotal)}</div>
+        <div style="font-size:0.72rem;color:var(--pale);">${weekly.length} Einkäufe</div>
+      </div>
+      <div style="background:var(--bg);border-radius:12px;padding:14px;">
+        <div style="font-size:0.62rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--pale);margin-bottom:4px;">Dieser Monat</div>
+        <div style="font-family:'Playfair Display',serif;font-size:1.4rem;color:var(--bx);">${fmt(monthTotal)}</div>
+        <div style="font-size:0.72rem;color:var(--pale);">${monthly.length} Einkäufe</div>
+      </div>
+    </div>
+
+    ${sortedCats.length > 0 ? `
+    <div style="margin-bottom:20px;">
+      <div style="font-size:0.72rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--pale);margin-bottom:10px;">Kategorien (${now.toLocaleString('de',{month:'long'})})</div>
+      ${sortedCats.slice(0,8).map(([cat,val])=>`
+        <div style="margin-bottom:8px;">
+          <div style="display:flex;justify-content:space-between;font-size:0.82rem;margin-bottom:3px;">
+            <span>${cat}</span><span style="font-weight:600;color:var(--bx);">${fmt(val)}</span>
+          </div>
+          <div style="height:6px;background:var(--line);border-radius:3px;overflow:hidden;">
+            <div style="height:100%;background:var(--mint);border-radius:3px;width:${Math.round(val/maxCat*100)}%;transition:width 0.4s;"></div>
+          </div>
+        </div>`).join("")}
+    </div>` : ""}
+
+    <div>
+      <div style="font-size:0.72rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--pale);margin-bottom:10px;">Letzte Einkäufe</div>
+      ${recent.map(p=>`
+        <div style="display:flex;align-items:center;padding:10px 0;border-bottom:1px solid var(--line);gap:10px;">
+          <div style="flex:1;">
+            <div style="font-size:0.88rem;font-weight:500;">${p.listName}</div>
+            <div style="font-size:0.72rem;color:var(--pale);">${new Date(p.date).toLocaleDateString('de')} · ${p.itemCount} Artikel</div>
+          </div>
+          <div style="font-family:'Playfair Display',serif;font-size:0.95rem;color:var(--bx);font-weight:700;">${fmt(p.total)}</div>
+        </div>`).join("")}
+    </div>
+
+    <button onclick="clearPurchases()" style="width:100%;margin-top:16px;padding:10px;background:none;border:1px solid var(--line);border-radius:10px;color:var(--pale);font-family:'DM Sans',sans-serif;font-size:0.82rem;cursor:pointer;">
+      Alle Ausgaben löschen
+    </button>
+  `;
+}
+
+function clearPurchases() {
+  if(confirm("Alle Ausgaben löschen?")) { purchases = []; savePurchases(); renderStats(); }
+}
+
+// ── KÜHLSCHRANK-MODUS ──
+let fridgeItems = JSON.parse(localStorage.getItem("ik_fridge") || "[]");
+function saveFridge() { localStorage.setItem("ik_fridge", JSON.stringify(fridgeItems)); }
+
+function addFridgeItem() {
+  const val = document.getElementById("fridgeInp").value.trim();
+  if(!val) return;
+  val.split(",").map(v=>v.trim()).filter(Boolean).forEach(item => {
+    if(!fridgeItems.includes(item)) fridgeItems.push(item);
+  });
+  saveFridge();
+  document.getElementById("fridgeInp").value = "";
+  renderFridge();
+}
+
+function removeFridgeItem(item) {
+  fridgeItems = fridgeItems.filter(i=>i!==item);
+  saveFridge();
+  renderFridge();
+}
+
+function renderFridge() {
+  // Chips
+  const chipsEl = document.getElementById("fridgeChips");
+  if(fridgeItems.length === 0) {
+    chipsEl.innerHTML = '<span style="font-size:0.78rem;color:var(--pale);">Noch nichts eingetragen</span>';
+  } else {
+    chipsEl.innerHTML = fridgeItems.map(item =>
+      `<span style="display:inline-flex;align-items:center;gap:5px;background:rgba(91,191,181,0.12);border:1px solid rgba(91,191,181,0.3);border-radius:14px;padding:4px 10px;margin:3px;font-size:0.78rem;font-weight:500;color:var(--dark);">
+        ${item}
+        <button onclick="removeFridgeItem('${encodeURIComponent(item)}')" style="background:none;border:none;color:var(--pale);cursor:pointer;font-size:0.9rem;padding:0;line-height:1;">✕</button>
+      </span>`
+    ).join("");
+  }
+
+  const container = document.getElementById("scrollFridge");
+  if(fridgeItems.length === 0) {
+    container.innerHTML = `<div class="empty"><div class="empty-icon">🥦</div><p>Tipp ein was du noch im Kühlschrank hast<br>und ich zeige dir <strong style="color:var(--mint);">was du kochen kannst!</strong></p></div>`;
+    return;
+  }
+
+  // Rezepte matchen
+  const lowerFridge = fridgeItems.map(i=>i.toLowerCase());
+  const recipes = allRecipes().map(r => {
+    const matches = r.zutaten.filter(z => lowerFridge.some(f => z.toLowerCase().includes(f) || f.includes(z.toLowerCase().split(" ")[0])));
+    const missing = r.zutaten.filter(z => !lowerFridge.some(f => z.toLowerCase().includes(f) || f.includes(z.toLowerCase().split(" ")[0])));
+    return { ...r, matches, missing, score: matches.length / Math.max(r.zutaten.length, 1) };
+  }).filter(r => r.matches.length > 0).sort((a,b) => b.score - a.score);
+
+  if(recipes.length === 0) {
+    container.innerHTML = `<div class="empty"><div class="empty-icon">🤔</div><p>Keine passenden Rezepte gefunden.<br>Füge mehr Zutaten hinzu!</p></div>`;
+    return;
+  }
+
+  const perfect = recipes.filter(r => r.missing.length === 0);
+  const almost = recipes.filter(r => r.missing.length > 0 && r.missing.length <= 3);
+  const possible = recipes.filter(r => r.missing.length > 3);
+
+  let html = "";
+  if(perfect.length) {
+    html += `<div class="sec-head"><span>✅ Sofort kochen</span><span>${perfect.length} Rezepte</span></div>`;
+    html += perfect.map(r => fridgeRecipeCard(r)).join("");
+  }
+  if(almost.length) {
+    html += `<div class="sec-head"><span>🛒 Fast vollständig</span><span>${almost.length} Rezepte</span></div>`;
+    html += almost.map(r => fridgeRecipeCard(r)).join("");
+  }
+  if(possible.length) {
+    html += `<div class="sec-head"><span>💡 Möglich</span><span>${possible.length} Rezepte</span></div>`;
+    html += possible.slice(0,5).map(r => fridgeRecipeCard(r)).join("");
+  }
+  container.innerHTML = html;
+}
+
+function fridgeRecipeCard(r) {
+  const cost = r.zutaten.reduce((s,z)=>s+getPrice(z),0);
+  return `<div class="recipe-card">
+    <div style="display:flex;align-items:flex-start;gap:8px;">
+      <div style="flex:1;">
+        <div class="recipe-name">${r.name}</div>
+        ${r.missing.length > 0 ? `<div style="font-size:0.72rem;color:var(--pale);margin-top:3px;">Fehlt: <span style="color:var(--bx);">${r.missing.join(", ")}</span></div>` : '<div style="font-size:0.72rem;color:var(--mint);margin-top:3px;font-weight:600;">Alle Zutaten vorhanden ✓</div>'}
+        ${cost>0?`<div class="recipe-cost">ca. ${fmt(cost)}</div>`:""}
+      </div>
+      <div style="display:flex;flex-direction:column;gap:5px;flex-shrink:0;">
+        <button class="recipe-add-btn" onclick="addRecipeToList('${encodeURIComponent(r.name)}')">+ Einkauf</button>
+        ${r.missing.length > 0 ? `<button onclick="addMissingToList('${encodeURIComponent(r.name)}')" style="background:var(--bx);color:white;border:none;border-radius:8px;padding:5px 10px;font-family:'DM Sans',sans-serif;font-size:0.72rem;font-weight:600;cursor:pointer;">+ Fehlende</button>` : ""}
+      </div>
+    </div>
+  </div>`;
+}
+
+function addMissingToList(enc) {
+  const name = decodeURIComponent(enc);
+  const r = allRecipes().find(r=>r.name===name);
+  if(!r) return;
+  const lowerFridge = fridgeItems.map(i=>i.toLowerCase());
+  const missing = r.zutaten.filter(z => !lowerFridge.some(f => z.toLowerCase().includes(f) || f.includes(z.toLowerCase().split(" ")[0])));
+  let added = 0;
+  missing.forEach(z => {
+    if(!list.find(i=>i.name===z&&!i.done)) {
+      list.push({id:Date.now()+Math.random(),name:z,done:false,qty:1});
+      added++;
+    }
+  });
+  saveList(); switchTab("liste"); renderList();
+  showToast(`✓ ${added} fehlende Zutaten auf Liste`);
 }
 
 // ── TEILEN ──
@@ -1351,6 +1738,8 @@ function updateQuickBudgetSub() {
   sub.textContent = budget > 0 ? `Budget: ${fmt(budget)}` : 'Wochenplan aus Budget';
 }
 
+// Liste aus lists laden
+if(lists[currentListId]) list = [...lists[currentListId]];
 renderList();
 renderRecipes();
 updateBudgetDisplay();
