@@ -1,0 +1,33 @@
+# Verzeichnis-Listing verhindern
+Options -Indexes
+
+# Security Headers
+<IfModule mod_headers.c>
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set X-Frame-Options "SAMEORIGIN"
+    Header always set X-XSS-Protection "1; mode=block"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+    Header always set Permissions-Policy "geolocation=(), microphone=(), camera=()"
+    Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:;"
+</IfModule>
+
+# index.html nie cachen (v.a. Safari iOS cached sonst hartnäckig alte Stände)
+<FilesMatch "^index\.html$">
+    <IfModule mod_headers.c>
+        Header set Cache-Control "no-cache, no-store, must-revalidate"
+        Header set Pragma "no-cache"
+        Header set Expires "0"
+    </IfModule>
+</FilesMatch>
+
+# Nur HTML und bekannte Dateitypen erlauben
+<FilesMatch "\.(php|py|pl|cgi|sh|exe|bat)$">
+    Order Allow,Deny
+    Deny from all
+</FilesMatch>
+
+# Kein Zugriff auf versteckte Dateien
+<FilesMatch "^\.">
+    Order Allow,Deny
+    Deny from all
+</FilesMatch>
