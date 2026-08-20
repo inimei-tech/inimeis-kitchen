@@ -5,10 +5,11 @@ Danke dass du zum Projekt beitragen möchtest! 💚
 ## Wie du helfen kannst
 
 ### 🥘 Rezepte hinzufügen
-Öffne `index.html` und suche nach `const RECIPES = [`.  
+
+Öffne `index.html` und suche nach `const RECIPES = [`.
 Füge dein Rezept in diesem Format hinzu:
 
-```javascript
+```
 {
   "name": "Mein Rezept",
   "tags": "Schnell, Vegetarisch",
@@ -18,21 +19,25 @@ Füge dein Rezept in diesem Format hinzu:
 ```
 
 ### 🏪 Preise ergänzen
+
 Suche nach `const BASE_CATALOG = {` und ergänze Artikel:
 
-```javascript
+```
 "Artikelname": { "price": 1.99, "shop": "Lidl", "cat": "Gemüse" }
 ```
 
 Kategorien: `Gemüse`, `Obst`, `Milchprodukte`, `Fleisch&Fisch`, `Backwaren`, `Trockenwaren`, `Getränke`, `Süßigkeiten`, `Kosmetik`, `Haushaltsartikel`, `Sonstiges`
 
 ### 🐛 Bug melden
+
 Erstelle ein [Issue](https://github.com/inimei-tech/inimeis-kitchen/issues) mit:
+
 - Was hast du erwartet?
 - Was ist passiert?
 - Welches Gerät/Browser?
 
 ### 💡 Feature vorschlagen
+
 Auch dafür gerne ein Issue öffnen mit dem Label `enhancement`.
 
 ## Pull Request Prozess
@@ -52,4 +57,4 @@ Auch dafür gerne ein Issue öffnen mit dem Label `enhancement`.
 
 ## Fragen?
 
-📬 [inimeiskitchen.com](https://inimeiskitchen.com) oder GitHub Issues
+📬 [inimei_01@proton.me](mailto:inimei_01@proton.me) oder GitHub Issues
